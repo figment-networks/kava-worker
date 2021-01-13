@@ -224,6 +224,13 @@ func rawToTransaction(ctx context.Context, c *Client, in []TxResponse, blocks ma
 			logAtIndex := findLog(lf, index)
 
 			switch msg.Route() {
+			case "auction":
+				switch msg.Type() {
+				case "place_bid":
+					ev, err = mapAuctionPlaceBidToSub(msg)
+				default:
+					c.logger.Error("[COSMOS-API] Unknown auction message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
+				}
 			case "bank":
 				switch msg.Type() {
 				case "multisend":
@@ -232,6 +239,41 @@ func rawToTransaction(ctx context.Context, c *Client, in []TxResponse, blocks ma
 					ev, err = mapBankSendToSub(msg, logAtIndex)
 				default:
 					c.logger.Error("[COSMOS-API] Unknown bank message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
+				}
+			case "bep3":
+				switch msg.Type() {
+				case "createAtomicSwap":
+					ev, err = mapBep3CreateAtomicSwapToSub(msg)
+				case "claimAtomicSwap":
+					ev, err = mapBep3ClaimAtomicSwapToSub(msg)
+				case "refundAtomicSwap":
+					ev, err = mapBep3RefundAtomicSwapToSub(msg)
+				default:
+					c.logger.Error("[COSMOS-API] Unknown bep3 message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
+				}
+			case "cdp":
+				switch msg.Type() {
+				case "create_cdp":
+					ev, err = mapCDPCreateCDPToSub(msg)
+				case "deposit_cdp":
+					ev, err = mapCDPDepositCDPToSub(msg)
+				case "withdraw_cdp":
+					ev, err = mapCDPWithdrawCDPToSub(msg)
+				case "draw_cdp":
+					ev, err = mapCDPDrawCDPToSub(msg)
+				case "repay_cdp":
+					ev, err = mapCDPRepayCDPToSub(msg)
+				default:
+					c.logger.Error("[COSMOS-API] Unknown cdp message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
+				}
+			case "committee":
+				switch msg.Type() {
+				case "commmittee_submit_proposal":
+					ev, err = mapCommitteeSubmitProposalToSub(msg)
+				case "committee_vote":
+					ev, err = mapCommitteeVoteToSub(msg)
+				default:
+					c.logger.Error("[COSMOS-API] Unknown committee message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
 				}
 			case "crisis":
 				switch msg.Type() {
@@ -270,6 +312,47 @@ func rawToTransaction(ctx context.Context, c *Client, in []TxResponse, blocks ma
 					ev, err = mapGovSubmitProposalToSub(msg, logAtIndex)
 				default:
 					c.logger.Error("[COSMOS-API] Unknown got message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
+				}
+			case "harvest":
+				switch msg.Type() {
+				case "harvest_deposit":
+					ev, err = mapHarvestDepositToSub(msg)
+				case "harvest_withdraw":
+					ev, err = mapHarvestWithdrawToSub(msg)
+				case "claim_harvest_reward":
+					ev, err = mapHarvestClaimRewardToSub(msg)
+				default:
+					c.logger.Error("[COSMOS-API] Unknown harvest message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
+				}
+			case "incentive":
+				switch msg.Type() {
+				case "claim_reward":
+					// print = true
+					ev, err = mapIncentiveClaimRewardToSub(msg)
+				default:
+					c.logger.Error("[COSMOS-API] Unknown pricefeed message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
+				}
+			case "issuance":
+				switch msg.Type() {
+				case "issue_tokens":
+					ev, err = mapIssuanceIssueTokensToSub(msg)
+				case "redeem_tokens":
+					ev, err = mapIssuanceRedeemTokensToSub(msg)
+				case "block_address":
+					ev, err = mapIssuanceBlockAddressToSub(msg)
+				case "unblock_address":
+					ev, err = mapIssuanceUnblockAddressToSub(msg)
+				case "change_pause_status":
+					ev, err = mapIssuanceMsgSetPauseStatusToSub(msg)
+				default:
+					c.logger.Error("[COSMOS-API] Unknown pricefeed message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
+				}
+			case "pricefeed":
+				switch msg.Type() {
+				case "post_price":
+					ev, err = mapPricefeedPostPrice(msg)
+				default:
+					c.logger.Error("[COSMOS-API] Unknown pricefeed message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
 				}
 			case "slashing":
 				switch msg.Type() {
