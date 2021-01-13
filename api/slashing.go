@@ -8,7 +8,6 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	slashing "github.com/cosmos/cosmos-sdk/x/slashing"
-	"github.com/kava-labs/kava/app"
 	"github.com/tendermint/tendermint/libs/bech32"
 )
 
@@ -18,8 +17,7 @@ func mapSlashingUnjailToSub(msg sdk.Msg) (se shared.SubsetEvent, er error) {
 		return se, errors.New("Not an unjail type")
 	}
 
-	//todo
-	bech32Addr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, unjail.ValidatorAddr.Bytes())
+	bech32Addr, err := bech32.ConvertAndEncode(bech32ValPrefix, unjail.ValidatorAddr.Bytes())
 	if err != nil {
 		return se, fmt.Errorf("error converting ValidatorAddr: %w", err)
 	}

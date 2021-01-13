@@ -3,7 +3,12 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/kava-labs/kava/app"
 )
+
+var bech32ValPrefix string = app.Bech32MainPrefix + sdk.PrefixValidator + sdk.PrefixOperator
 
 // TxResponse is result of querying for a tx
 type TxResponse struct {

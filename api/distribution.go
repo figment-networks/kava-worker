@@ -23,7 +23,7 @@ func mapDistributionWithdrawValidatorCommissionToSub(msg sdk.Msg, logf LogFormat
 	}
 
 	//todo validator prefix?
-	bech32Addr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, wvc.ValidatorAddress.Bytes())
+	bech32Addr, err := bech32.ConvertAndEncode(bech32ValPrefix, wvc.ValidatorAddress.Bytes())
 	if err != nil {
 		return se, fmt.Errorf("error converting ValidatorAddress: %w", err)
 	}
@@ -76,7 +76,7 @@ func mapDistributionWithdrawDelegatorRewardToSub(msg sdk.Msg, logf LogFormat) (s
 	if err != nil {
 		return se, fmt.Errorf("error converting DelegatorAddress: %w", err)
 	}
-	bech32ValAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, wdr.ValidatorAddress.Bytes())
+	bech32ValAddr, err := bech32.ConvertAndEncode(bech32ValPrefix, wdr.ValidatorAddress.Bytes())
 	if err != nil {
 		return se, fmt.Errorf("error converting ValidatorAddress: %w", err)
 	}

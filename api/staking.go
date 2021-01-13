@@ -115,7 +115,7 @@ func mapStakingDelegateToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent
 		return se, fmt.Errorf("error converting DelegatorAddress: %w", err)
 	}
 
-	bech32ValAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, d.ValidatorAddress.Bytes())
+	bech32ValAddr, err := bech32.ConvertAndEncode(bech32ValPrefix, d.ValidatorAddress.Bytes())
 	if err != nil {
 		return se, fmt.Errorf("error converting ValidatorAddress: %w", err)
 	}
@@ -192,7 +192,7 @@ func mapStakingCreateValidatorToSub(msg sdk.Msg) (se shared.SubsetEvent, err err
 	if err != nil {
 		return se, fmt.Errorf("error converting DelegatorAddress: %w", err)
 	}
-	bech32ValAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, ev.ValidatorAddress.Bytes())
+	bech32ValAddr, err := bech32.ConvertAndEncode(bech32ValPrefix, ev.ValidatorAddress.Bytes())
 	if err != nil {
 		return se, fmt.Errorf("error converting ValidatorAddress: %w", err)
 	}
@@ -245,7 +245,7 @@ func mapStakingEditValidatorToSub(msg sdk.Msg) (se shared.SubsetEvent, err error
 		return se, errors.New("Not a edit_validator type")
 	}
 
-	bech32ValAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, ev.ValidatorAddress.Bytes())
+	bech32ValAddr, err := bech32.ConvertAndEncode(bech32ValPrefix, ev.ValidatorAddress.Bytes())
 	if err != nil {
 		return se, fmt.Errorf("error converting ValidatorAddress: %w", err)
 	}
