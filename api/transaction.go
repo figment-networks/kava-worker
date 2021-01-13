@@ -147,13 +147,12 @@ func rawToTransaction(ctx context.Context, c *Client, in []TxResponse, blocks ma
 		txErrs := []TxLogError{}
 
 		if err := json.Unmarshal([]byte(txRaw.TxResult.Log), &lf); err != nil {
-			// (lukanus): Try to fallback to known error format
-			tle := TxLogError{}
-			if errin := json.Unmarshal([]byte(txRaw.TxResult.Log), &tle); errin != nil {
-				logger.Error("[COSMOS-API] Problem decoding raw transaction (json)", zap.Error(err), zap.String("content_log", txRaw.TxResult.Log), zap.Any("content", txRaw))
-			}
-			if tle.Message != "" {
-				txErrs = append(txErrs, tle)
+			if txRaw.TxResult.Log != "" && txRaw.TxResult.Code > 0 {
+				txErrs = append(txErrs, TxLogError{
+					Message:   txRaw.TxResult.Log,
+					Code:      txRaw.TxResult.Code,
+					Codespace: txRaw.TxResult.Codespace,
+				})
 			}
 		}
 

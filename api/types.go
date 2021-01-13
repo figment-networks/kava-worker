@@ -21,6 +21,8 @@ type TxResponse struct {
 // ResponseDeliverTx result
 type ResponseDeliverTx struct {
 	Log       string  `json:"log"`
+	Code      float64 `json:"code"`
+	Codespace string  `json:"codespace"`
 	GasWanted string  `json:"gasWanted"`
 	GasUsed   string  `json:"gasUsed"`
 	Tags      []TxTag `json:"tags"`
