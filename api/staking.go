@@ -9,6 +9,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	staking "github.com/cosmos/cosmos-sdk/x/staking"
+	"github.com/kava-labs/kava/app"
+	"github.com/tendermint/tendermint/libs/bech32"
 )
 
 const unbondedTokensPoolAddr = "cosmos1tygms3xhhs3yv487phx3dw4a95jn7t7lpm470r"
@@ -19,12 +21,22 @@ func mapStakingUndelegateToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEve
 		return se, errors.New("Not a begin_unbonding type")
 	}
 
+	bech32DelAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, u.DelegatorAddress.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting DelegatorAddress: %w", err)
+	}
+
+	bech32ValAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, u.ValidatorAddress.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting ValidatorAddress: %w", err)
+	}
+
 	se = shared.SubsetEvent{
 		Type:   []string{"begin_unbonding"},
 		Module: "staking",
 		Node: map[string][]shared.Account{
-			"delegator": {{ID: u.DelegatorAddress.String()}},
-			"validator": {{ID: u.ValidatorAddress.String()}},
+			"delegator": {{ID: bech32DelAddr}},
+			"validator": {{ID: bech32ValAddr}},
 		},
 		Amount: map[string]shared.TransactionAmount{
 			"undelegate": {
@@ -97,12 +109,23 @@ func mapStakingDelegateToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent
 	if !ok {
 		return se, errors.New("Not a delegate type")
 	}
+
+	bech32DelAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, d.DelegatorAddress.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting DelegatorAddress: %w", err)
+	}
+
+	bech32ValAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, d.ValidatorAddress.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting ValidatorAddress: %w", err)
+	}
+
 	se = shared.SubsetEvent{
 		Type:   []string{"delegate"},
 		Module: "staking",
 		Node: map[string][]shared.Account{
-			"delegator": {{ID: d.DelegatorAddress.String()}},
-			"validator": {{ID: d.ValidatorAddress.String()}},
+			"delegator": {{ID: bech32DelAddr}},
+			"validator": {{ID: bech32ValAddr}},
 		},
 		Amount: map[string]shared.TransactionAmount{
 			"delegate": {
@@ -123,13 +146,28 @@ func mapStakingBeginRedelegateToSub(msg sdk.Msg, logf LogFormat) (se shared.Subs
 		return se, errors.New("Not a begin_redelegate type")
 	}
 
+	bech32DelAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, br.DelegatorAddress.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting DelegatorAddress: %w", err)
+	}
+
+	bech32ValDstAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, br.ValidatorDstAddress.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting ValidatorDstAddress: %w", err)
+	}
+
+	bech32ValSrcAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, br.ValidatorSrcAddress.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting ValidatorSrcAddress: %w", err)
+	}
+
 	se = shared.SubsetEvent{
 		Type:   []string{"begin_redelegate"},
 		Module: "staking",
 		Node: map[string][]shared.Account{
-			"delegator":             {{ID: br.DelegatorAddress.String()}},
-			"validator_destination": {{ID: br.ValidatorDstAddress.String()}},
-			"validator_source":      {{ID: br.ValidatorDstAddress.String()}},
+			"delegator":             {{ID: bech32DelAddr}},
+			"validator_destination": {{ID: bech32ValDstAddr}},
+			"validator_source":      {{ID: bech32ValSrcAddr}},
 		},
 		Amount: map[string]shared.TransactionAmount{
 			"delegate": {
@@ -149,14 +187,24 @@ func mapStakingCreateValidatorToSub(msg sdk.Msg) (se shared.SubsetEvent, err err
 	if !ok {
 		return se, errors.New("Not a create_validator type")
 	}
+
+	bech32DelAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, ev.DelegatorAddress.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting DelegatorAddress: %w", err)
+	}
+	bech32ValAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, ev.ValidatorAddress.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting ValidatorAddress: %w", err)
+	}
+
 	return shared.SubsetEvent{
 		Type:   []string{"create_validator"},
 		Module: "distribution",
 		Node: map[string][]shared.Account{
-			"delegator": {{ID: ev.DelegatorAddress.String()}},
+			"delegator": {{ID: bech32DelAddr}},
 			"validator": {
 				{
-					ID: ev.ValidatorAddress.String(),
+					ID: bech32ValAddr,
 					Details: &shared.AccountDetails{
 						Name:        ev.Description.Moniker,
 						Description: ev.Description.Details,
@@ -196,13 +244,19 @@ func mapStakingEditValidatorToSub(msg sdk.Msg) (se shared.SubsetEvent, err error
 	if !ok {
 		return se, errors.New("Not a edit_validator type")
 	}
+
+	bech32ValAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, ev.ValidatorAddress.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting ValidatorAddress: %w", err)
+	}
+
 	sev := shared.SubsetEvent{
 		Type:   []string{"edit_validator"},
 		Module: "distribution",
 		Node: map[string][]shared.Account{
 			"validator": {
 				{
-					ID: ev.ValidatorAddress.String(),
+					ID: bech32ValAddr,
 					Details: &shared.AccountDetails{
 						Name:        ev.Description.Moniker,
 						Description: ev.Description.Details,

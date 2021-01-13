@@ -2,12 +2,15 @@ package api
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 
 	shared "github.com/figment-networks/indexer-manager/structs"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/kava-labs/kava/app"
 	"github.com/kava-labs/kava/x/bep3"
+	"github.com/tendermint/tendermint/libs/bech32"
 )
 
 func mapBep3CreateAtomicSwapToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
@@ -16,12 +19,21 @@ func mapBep3CreateAtomicSwapToSub(msg sdk.Msg) (se shared.SubsetEvent, err error
 		return se, errors.New("Not a createAtomicSwap type")
 	}
 
+	bech32FromAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, m.From.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting FromAddress: %w", err)
+	}
+	bech32ToAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, m.To.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting ToAddress: %w", err)
+	}
+
 	se = shared.SubsetEvent{
 		Type:   []string{"create_atomic_swap"},
 		Module: "bep3",
 		Node: map[string][]shared.Account{
-			"from": {{ID: m.From.String()}},
-			"to":   {{ID: m.To.String()}},
+			"from": {{ID: bech32FromAddr}},
+			"to":   {{ID: bech32ToAddr}},
 		},
 		Additional: map[string][]string{
 			"recipient_other_chain": []string{m.RecipientOtherChain},
@@ -57,11 +69,16 @@ func mapBep3ClaimAtomicSwapToSub(msg sdk.Msg) (se shared.SubsetEvent, err error)
 	}
 	// todo get amount (from logs?)
 
+	bech32Addr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, m.From.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting FromAddress: %w", err)
+	}
+
 	return shared.SubsetEvent{
 		Type:   []string{"claim_atomic_swap"},
 		Module: "bep3",
 		Node: map[string][]shared.Account{
-			"from": {{ID: m.From.String()}},
+			"from": {{ID: bech32Addr}},
 		},
 		Additional: map[string][]string{
 			"swap_id":       []string{m.SwapID.String()},
@@ -76,13 +93,17 @@ func mapBep3RefundAtomicSwapToSub(msg sdk.Msg) (se shared.SubsetEvent, err error
 		return se, errors.New("Not a refundAtomicSwap type")
 	}
 
+	bech32Addr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, m.From.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting FromAddress: %w", err)
+	}
+
 	return shared.SubsetEvent{
 		Type:   []string{"refund_atomic_swap"},
 		Module: "bep3",
 		Node: map[string][]shared.Account{
-			"from": {{ID: m.From.String()}},
+			"from": {{ID: bech32Addr}},
 		},
-		Amount: map[string]shared.TransactionAmount{},
 		Additional: map[string][]string{
 			"swap_id": []string{m.SwapID.String()},
 		},

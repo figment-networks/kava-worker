@@ -20,7 +20,7 @@ func mapIncentiveClaimRewardToSub(msg sdk.Msg) (se shared.SubsetEvent, err error
 
 	bech32Addr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, m.Sender.Bytes())
 	if err != nil {
-		return se, fmt.Errorf("error converting ValidatorAddress: %w", err)
+		return se, fmt.Errorf("error converting Address: %w", err)
 	}
 
 	return shared.SubsetEvent{

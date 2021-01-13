@@ -2,12 +2,15 @@ package api
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 
 	shared "github.com/figment-networks/indexer-manager/structs"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	evidence "github.com/cosmos/cosmos-sdk/x/evidence"
+	"github.com/kava-labs/kava/app"
+	"github.com/tendermint/tendermint/libs/bech32"
 )
 
 func mapEvidenceSubmitEvidenceToSub(msg sdk.Msg) (se shared.SubsetEvent, er error) {
@@ -16,10 +19,15 @@ func mapEvidenceSubmitEvidenceToSub(msg sdk.Msg) (se shared.SubsetEvent, er erro
 		return se, errors.New("Not a submit_evidence type")
 	}
 
+	bech32Addr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, mse.Submitter.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting SubmitterAddress: %w", err)
+	}
+
 	return shared.SubsetEvent{
 		Type:   []string{"submit_evidence"},
 		Module: "evidence",
-		Node:   map[string][]shared.Account{"submitter": {{ID: mse.Submitter.String()}}},
+		Node:   map[string][]shared.Account{"submitter": {{ID: bech32Addr}}},
 		Additional: map[string][]string{
 			"evidence_consensus":       {mse.Evidence.GetConsensusAddress().String()},
 			"evidence_height":          {strconv.FormatInt(mse.Evidence.GetHeight(), 10)},

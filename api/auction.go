@@ -2,12 +2,15 @@ package api
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 
 	shared "github.com/figment-networks/indexer-manager/structs"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/kava-labs/kava/app"
 	"github.com/kava-labs/kava/x/auction"
+	"github.com/tendermint/tendermint/libs/bech32"
 )
 
 func mapAuctionPlaceBidToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
@@ -16,11 +19,16 @@ func mapAuctionPlaceBidToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 		return se, errors.New("Not a place_bid type")
 	}
 
+	bech32Addr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, m.Bidder.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting Address: %w", err)
+	}
+
 	se = shared.SubsetEvent{
 		Type:   []string{"place_bid"},
 		Module: "auction",
 		Node: map[string][]shared.Account{
-			"bidder": {{ID: m.Bidder.String()}},
+			"bidder": {{ID: bech32Addr}},
 		},
 		Amount: map[string]shared.TransactionAmount{
 			"bid": {

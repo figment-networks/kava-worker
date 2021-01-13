@@ -2,11 +2,14 @@ package api
 
 import (
 	"errors"
+	"fmt"
 
 	shared "github.com/figment-networks/indexer-manager/structs"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	bank "github.com/cosmos/cosmos-sdk/x/bank"
+	"github.com/kava-labs/kava/app"
+	"github.com/tendermint/tendermint/libs/bech32"
 )
 
 func mapBankMultisendToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent, err error) {
@@ -62,9 +65,13 @@ func mapBankSendToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent, err e
 }
 
 func bankProduceEvTx(account sdk.AccAddress, coins sdk.Coins) (evt shared.EventTransfer, err error) {
+	bech32Addr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, account.Bytes())
+	if err != nil {
+		return evt, fmt.Errorf("error converting Address: %w", err)
+	}
 
 	evt = shared.EventTransfer{
-		Account: shared.Account{ID: account.String()},
+		Account: shared.Account{ID: bech32Addr},
 	}
 	if len(coins) > 0 {
 		evt.Amounts = []shared.TransactionAmount{}

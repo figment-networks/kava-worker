@@ -2,12 +2,15 @@ package api
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 
 	shared "github.com/figment-networks/indexer-manager/structs"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	gov "github.com/cosmos/cosmos-sdk/x/gov"
+	"github.com/kava-labs/kava/app"
+	"github.com/tendermint/tendermint/libs/bech32"
 )
 
 func mapGovDepositToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent, err error) {
@@ -16,14 +19,19 @@ func mapGovDepositToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent, err
 		return se, errors.New("Not a deposit type")
 	}
 
+	bech32Addr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, dep.Depositor.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting DepositorAddress: %w", err)
+	}
+
 	se = shared.SubsetEvent{
 		Type:       []string{"deposit"},
 		Module:     "gov",
-		Node:       map[string][]shared.Account{"depositor": {{ID: dep.Depositor.String()}}},
+		Node:       map[string][]shared.Account{"depositor": {{ID: bech32Addr}}},
 		Additional: map[string][]string{"proposalID": {strconv.FormatUint(dep.ProposalID, 10)}},
 	}
 
-	sender := shared.EventTransfer{Account: shared.Account{ID: dep.Depositor.String()}}
+	sender := shared.EventTransfer{Account: shared.Account{ID: bech32Addr}}
 	txAmount := map[string]shared.TransactionAmount{}
 
 	for i, coin := range dep.Amount {
@@ -55,10 +63,15 @@ func mapGovVoteToSub(msg sdk.Msg) (se shared.SubsetEvent, er error) {
 		return se, errors.New("Not a vote type")
 	}
 
+	bech32Addr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, vote.Voter.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting VoterAddress: %w", err)
+	}
+
 	return shared.SubsetEvent{
 		Type:   []string{"vote"},
 		Module: "gov",
-		Node:   map[string][]shared.Account{"voter": {{ID: vote.Voter.String()}}},
+		Node:   map[string][]shared.Account{"voter": {{ID: bech32Addr}}},
 		Additional: map[string][]string{
 			"proposalID": {strconv.FormatUint(vote.ProposalID, 10)},
 			"option":     {vote.Option.String()},
@@ -72,13 +85,18 @@ func mapGovSubmitProposalToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEve
 		return se, errors.New("Not a submit_proposal type")
 	}
 
+	bech32Addr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, sp.Proposer.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting ProposerAddress: %w", err)
+	}
+
 	se = shared.SubsetEvent{
 		Type:   []string{"submit_proposal"},
 		Module: "gov",
-		Node:   map[string][]shared.Account{"proposer": {{ID: sp.Proposer.String()}}},
+		Node:   map[string][]shared.Account{"proposer": {{ID: bech32Addr}}},
 	}
 
-	sender := shared.EventTransfer{Account: shared.Account{ID: sp.Proposer.String()}}
+	sender := shared.EventTransfer{Account: shared.Account{ID: bech32Addr}}
 	txAmount := map[string]shared.TransactionAmount{}
 
 	for i, coin := range sp.InitialDeposit {

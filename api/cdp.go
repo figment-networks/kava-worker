@@ -2,11 +2,14 @@ package api
 
 import (
 	"errors"
+	"fmt"
 
 	shared "github.com/figment-networks/indexer-manager/structs"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/kava-labs/kava/app"
 	"github.com/kava-labs/kava/x/cdp"
+	"github.com/tendermint/tendermint/libs/bech32"
 )
 
 func mapCDPCreateCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
@@ -15,11 +18,16 @@ func mapCDPCreateCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 		return se, errors.New("Not a create_cdp type")
 	}
 
+	bech32Addr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, m.Sender.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting SenderAddress: %w", err)
+	}
+
 	return shared.SubsetEvent{
 		Type:   []string{"create_cdp"},
 		Module: "cdp",
 		Node: map[string][]shared.Account{
-			"sender": {{ID: m.Sender.String()}},
+			"sender": {{ID: bech32Addr}},
 		},
 		Amount: map[string]shared.TransactionAmount{
 			"collateral": {
@@ -45,12 +53,22 @@ func mapCDPDepositCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 		return se, errors.New("Not a deposit_cdp type")
 	}
 
+	bech32DepositorAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, m.Depositor.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting DepositorAddress: %w", err)
+	}
+
+	bech32OwnerAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, m.Owner.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting OwnerAddress: %w", err)
+	}
+
 	return shared.SubsetEvent{
 		Type:   []string{"deposit_cdp"},
 		Module: "cdp",
 		Node: map[string][]shared.Account{
-			"depositor": {{ID: m.Depositor.String()}},
-			"owner":     {{ID: m.Owner.String()}},
+			"depositor": {{ID: bech32DepositorAddr}},
+			"owner":     {{ID: bech32OwnerAddr}},
 		},
 		Amount: map[string]shared.TransactionAmount{
 			"collateral": {
@@ -71,12 +89,22 @@ func mapCDPWithdrawCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 		return se, errors.New("Not a withdraw_cdp type")
 	}
 
+	bech32DepositorAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, m.Depositor.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting DepositerAddress: %w", err)
+	}
+
+	bech32OwnerAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, m.Owner.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting OwnerAddress: %w", err)
+	}
+
 	return shared.SubsetEvent{
 		Type:   []string{"withdraw_cdp"},
 		Module: "cdp",
 		Node: map[string][]shared.Account{
-			"depositor": {{ID: m.Depositor.String()}},
-			"owner":     {{ID: m.Owner.String()}},
+			"depositor": {{ID: bech32DepositorAddr}},
+			"owner":     {{ID: bech32OwnerAddr}},
 		},
 		Amount: map[string]shared.TransactionAmount{
 			"collateral": {
@@ -97,11 +125,16 @@ func mapCDPDrawCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 		return se, errors.New("Not a draw_cdp type")
 	}
 
+	bech32Addr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, m.Sender.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting SenderAddress: %w", err)
+	}
+
 	return shared.SubsetEvent{
 		Type:   []string{"draw_cdp"},
 		Module: "cdp",
 		Node: map[string][]shared.Account{
-			"sender": {{ID: m.Sender.String()}},
+			"sender": {{ID: bech32Addr}},
 		},
 		Amount: map[string]shared.TransactionAmount{
 			"principal": {
@@ -122,11 +155,16 @@ func mapCDPRepayCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 		return se, errors.New("Not a repay_cdp type")
 	}
 
+	bech32Addr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, m.Sender.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting SenderAddress: %w", err)
+	}
+
 	return shared.SubsetEvent{
 		Type:   []string{"repay_cdp"},
 		Module: "cdp",
 		Node: map[string][]shared.Account{
-			"sender": {{ID: m.Sender.String()}},
+			"sender": {{ID: bech32Addr}},
 		},
 		Amount: map[string]shared.TransactionAmount{
 			"payment": {

@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"fmt"
 	"math/big"
 
 	shared "github.com/figment-networks/indexer-manager/structs"
@@ -9,6 +10,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	distribution "github.com/cosmos/cosmos-sdk/x/distribution"
 	distributiontypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
+	"github.com/kava-labs/kava/app"
+	"github.com/tendermint/tendermint/libs/bech32"
 )
 
 var zero big.Int
@@ -19,12 +22,18 @@ func mapDistributionWithdrawValidatorCommissionToSub(msg sdk.Msg, logf LogFormat
 		return se, errors.New("Not a withdraw_validator_commission type")
 	}
 
+	//todo validator prefix?
+	bech32Addr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, wvc.ValidatorAddress.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting ValidatorAddress: %w", err)
+	}
+
 	se = shared.SubsetEvent{
 		Type:   []string{"withdraw_validator_commission"},
 		Module: "distribution",
-		Node:   map[string][]shared.Account{"validator": {{ID: wvc.ValidatorAddress.String()}}},
+		Node:   map[string][]shared.Account{"validator": {{ID: bech32Addr}}},
 		Recipient: []shared.EventTransfer{{
-			Account: shared.Account{ID: wvc.ValidatorAddress.String()},
+			Account: shared.Account{ID: bech32Addr},
 		}},
 	}
 
@@ -38,12 +47,22 @@ func mapDistributionSetWithdrawAddressToSub(msg sdk.Msg) (se shared.SubsetEvent,
 		return se, errors.New("Not a set_withdraw_address type")
 	}
 
+	bech32DelAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, swa.DelegatorAddress.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting DelegatorAddress: %w", err)
+	}
+
+	bech32WithdrawAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, swa.WithdrawAddress.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting WithdrawAddress: %w", err)
+	}
+
 	return shared.SubsetEvent{
 		Type:   []string{"set_withdraw_address"},
 		Module: "distribution",
 		Node: map[string][]shared.Account{
-			"delegator": {{ID: swa.DelegatorAddress.String()}},
-			"withdraw":  {{ID: swa.WithdrawAddress.String()}},
+			"delegator": {{ID: bech32DelAddr}},
+			"withdraw":  {{ID: bech32WithdrawAddr}},
 		},
 	}, nil
 }
@@ -53,15 +72,24 @@ func mapDistributionWithdrawDelegatorRewardToSub(msg sdk.Msg, logf LogFormat) (s
 	if !ok {
 		return se, errors.New("Not a withdraw_validator_commission type")
 	}
+	bech32DelAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, wdr.DelegatorAddress.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting DelegatorAddress: %w", err)
+	}
+	bech32ValAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, wdr.ValidatorAddress.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting ValidatorAddress: %w", err)
+	}
+
 	se = shared.SubsetEvent{
 		Type:   []string{"withdraw_delegator_reward"},
 		Module: "distribution",
 		Node: map[string][]shared.Account{
-			"delegator": {{ID: wdr.DelegatorAddress.String()}},
-			"validator": {{ID: wdr.ValidatorAddress.String()}},
+			"delegator": {{ID: bech32DelAddr}},
+			"validator": {{ID: bech32ValAddr}},
 		},
 		Recipient: []shared.EventTransfer{{
-			Account: shared.Account{ID: wdr.DelegatorAddress.String()},
+			Account: shared.Account{ID: bech32DelAddr},
 		}},
 	}
 
@@ -70,10 +98,14 @@ func mapDistributionWithdrawDelegatorRewardToSub(msg sdk.Msg, logf LogFormat) (s
 }
 
 func mapDistributionFundCommunityPoolToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent, er error) {
-
 	fcp, ok := msg.(distributiontypes.MsgFundCommunityPool)
 	if !ok {
 		return se, errors.New("Not a withdraw_validator_commission type")
+	}
+
+	bech32Addr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, fcp.Depositor.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting DepositorAddress: %w", err)
 	}
 
 	evt, err := distributionProduceEvTx(fcp.Depositor, fcp.Amount)
@@ -81,7 +113,7 @@ func mapDistributionFundCommunityPoolToSub(msg sdk.Msg, logf LogFormat) (se shar
 		Type:   []string{"fund_community_pool"},
 		Module: "distribution",
 		Node: map[string][]shared.Account{
-			"depositor": {{ID: fcp.Depositor.String()}},
+			"depositor": {{ID: bech32Addr}},
 		},
 		Sender: []shared.EventTransfer{evt},
 	}
@@ -90,7 +122,6 @@ func mapDistributionFundCommunityPoolToSub(msg sdk.Msg, logf LogFormat) (se shar
 }
 
 func distributionProduceEvTx(account sdk.AccAddress, coins sdk.Coins) (evt shared.EventTransfer, err error) {
-
 	evt = shared.EventTransfer{
 		Account: shared.Account{ID: account.String()},
 	}

@@ -2,12 +2,15 @@ package api
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 
 	shared "github.com/figment-networks/indexer-manager/structs"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/kava-labs/kava/app"
 	"github.com/kava-labs/kava/x/issuance"
+	"github.com/tendermint/tendermint/libs/bech32"
 )
 
 func mapIssuanceIssueTokensToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
@@ -16,12 +19,22 @@ func mapIssuanceIssueTokensToSub(msg sdk.Msg) (se shared.SubsetEvent, err error)
 		return se, errors.New("Not a issue_tokens type")
 	}
 
+	bech32SenderAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, m.Sender.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting SenderAddress: %w", err)
+	}
+
+	bech32RecAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, m.Receiver.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting ReceiverAddress: %w", err)
+	}
+
 	return shared.SubsetEvent{
 		Type:   []string{"issue_tokens"},
 		Module: "issuance",
 		Node: map[string][]shared.Account{
-			"sender":   {{ID: m.Sender.String()}},
-			"receiver": {{ID: m.Receiver.String()}},
+			"sender":   {{ID: bech32SenderAddr}},
+			"receiver": {{ID: bech32RecAddr}},
 		},
 		Amount: map[string]shared.TransactionAmount{
 			"send": {
@@ -39,11 +52,16 @@ func mapIssuanceRedeemTokensToSub(msg sdk.Msg) (se shared.SubsetEvent, err error
 		return se, errors.New("Not a redeem_tokens type")
 	}
 
+	bech32SenderAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, m.Sender.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting SenderAddress: %w", err)
+	}
+
 	return shared.SubsetEvent{
 		Type:   []string{"redeem_tokens"},
 		Module: "issuance",
 		Node: map[string][]shared.Account{
-			"sender": {{ID: m.Sender.String()}},
+			"sender": {{ID: bech32SenderAddr}},
 		},
 		Amount: map[string]shared.TransactionAmount{
 			"send": {
@@ -61,12 +79,22 @@ func mapIssuanceBlockAddressToSub(msg sdk.Msg) (se shared.SubsetEvent, err error
 		return se, errors.New("Not a block_address type")
 	}
 
+	bech32SenderAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, m.Sender.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting SenderAddress: %w", err)
+	}
+
+	bech32Addr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, m.Address.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting Address: %w", err)
+	}
+
 	return shared.SubsetEvent{
 		Type:   []string{"block_address"},
 		Module: "issuance",
 		Node: map[string][]shared.Account{
-			"sender":          {{ID: m.Sender.String()}},
-			"blocked_address": {{ID: m.Address.String()}},
+			"sender":          {{ID: bech32SenderAddr}},
+			"blocked_address": {{ID: bech32Addr}},
 		},
 		Additional: map[string][]string{
 			"denom": []string{m.Denom},
@@ -80,12 +108,22 @@ func mapIssuanceUnblockAddressToSub(msg sdk.Msg) (se shared.SubsetEvent, err err
 		return se, errors.New("Not a unblock_address type")
 	}
 
+	bech32SenderAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, m.Sender.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting SenderAddress: %w", err)
+	}
+
+	bech32Addr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, m.Address.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting Address: %w", err)
+	}
+
 	return shared.SubsetEvent{
 		Type:   []string{"unblock_address"},
 		Module: "issuance",
 		Node: map[string][]shared.Account{
-			"sender":  {{ID: m.Sender.String()}},
-			"address": {{ID: m.Address.String()}},
+			"sender":  {{ID: bech32SenderAddr}},
+			"address": {{ID: bech32Addr}},
 		},
 		Additional: map[string][]string{
 			"denom": []string{m.Denom},
@@ -99,11 +137,16 @@ func mapIssuanceMsgSetPauseStatusToSub(msg sdk.Msg) (se shared.SubsetEvent, err 
 		return se, errors.New("Not a change_pause_status type")
 	}
 
+	bech32SenderAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, m.Sender.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting SenderAddress: %w", err)
+	}
+
 	return shared.SubsetEvent{
 		Type:   []string{"change_pause_status"},
 		Module: "issuance",
 		Node: map[string][]shared.Account{
-			"sender": {{ID: m.Sender.String()}},
+			"sender": {{ID: bech32SenderAddr}},
 		},
 		Additional: map[string][]string{
 			"denom":  []string{m.Denom},
