@@ -44,9 +44,24 @@ func mapBep3CreateAtomicSwapToSub(msg sdk.Msg, logf LogFormat) (se shared.Subset
 		},
 	}
 
-	// todo SubsetEvent.Amount is a single amount, so adding amounts to transfers instead
-	// do we want to make SubsetEvent.Amount an array?
+	txAmount := map[string]shared.TransactionAmount{}
 
+	for i, coin := range m.Amount {
+		am := shared.TransactionAmount{
+			Currency: coin.Denom,
+			Numeric:  coin.Amount.BigInt(),
+			Text:     coin.Amount.String(),
+		}
+
+		key := "send"
+		if i > 0 {
+			key += "_" + strconv.Itoa(i)
+		}
+
+		txAmount[key] = am
+	}
+
+	se.Amount = txAmount
 	err = produceTransfers(&se, "send", logf)
 	return se, nil
 }
