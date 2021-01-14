@@ -226,7 +226,7 @@ func rawToTransaction(ctx context.Context, c *Client, in []TxResponse, blocks ma
 			case "auction":
 				switch msg.Type() {
 				case "place_bid":
-					ev, err = mapAuctionPlaceBidToSub(msg)
+					ev, err = mapAuctionPlaceBidToSub(msg, logAtIndex)
 				default:
 					c.logger.Error("[COSMOS-API] Unknown auction message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
 				}
@@ -242,11 +242,11 @@ func rawToTransaction(ctx context.Context, c *Client, in []TxResponse, blocks ma
 			case "bep3":
 				switch msg.Type() {
 				case "createAtomicSwap":
-					ev, err = mapBep3CreateAtomicSwapToSub(msg)
+					ev, err = mapBep3CreateAtomicSwapToSub(msg, logAtIndex)
 				case "claimAtomicSwap":
 					ev, err = mapBep3ClaimAtomicSwapToSub(msg)
 				case "refundAtomicSwap":
-					ev, err = mapBep3RefundAtomicSwapToSub(msg)
+					ev, err = mapBep3RefundAtomicSwapToSub(msg, logAtIndex)
 				default:
 					c.logger.Error("[COSMOS-API] Unknown bep3 message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
 				}
@@ -315,19 +315,18 @@ func rawToTransaction(ctx context.Context, c *Client, in []TxResponse, blocks ma
 			case "harvest":
 				switch msg.Type() {
 				case "harvest_deposit":
-					ev, err = mapHarvestDepositToSub(msg)
+					ev, err = mapHarvestDepositToSub(msg, logAtIndex)
 				case "harvest_withdraw":
-					ev, err = mapHarvestWithdrawToSub(msg)
+					ev, err = mapHarvestWithdrawToSub(msg, logAtIndex)
 				case "claim_harvest_reward":
-					ev, err = mapHarvestClaimRewardToSub(msg)
+					ev, err = mapHarvestClaimRewardToSub(msg, logAtIndex)
 				default:
 					c.logger.Error("[COSMOS-API] Unknown harvest message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
 				}
 			case "incentive":
 				switch msg.Type() {
 				case "claim_reward":
-					// print = true
-					ev, err = mapIncentiveClaimRewardToSub(msg)
+					ev, err = mapIncentiveClaimRewardToSub(msg, logAtIndex)
 				default:
 					c.logger.Error("[COSMOS-API] Unknown pricefeed message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
 				}
@@ -602,6 +601,8 @@ func produceTransfers(se *shared.SubsetEvent, transferType string, logf LogForma
 	}
 
 	for addr, amts := range m {
+		// todo should we include sender/recipient in EventTransfer?
+		// sender is available in kava logs
 		evts = append(evts, shared.EventTransfer{
 			Amounts: amts,
 			Account: shared.Account{ID: addr},

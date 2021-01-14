@@ -13,7 +13,7 @@ import (
 	"github.com/tendermint/tendermint/libs/bech32"
 )
 
-func mapAuctionPlaceBidToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func mapAuctionPlaceBidToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent, err error) {
 	m, ok := msg.(auction.MsgPlaceBid)
 	if !ok {
 		return se, errors.New("Not a place_bid type")
@@ -42,5 +42,6 @@ func mapAuctionPlaceBidToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 		},
 	}
 
+	err = produceTransfers(&se, "send", logf)
 	return se, nil
 }

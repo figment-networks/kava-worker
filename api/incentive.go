@@ -12,7 +12,7 @@ import (
 	"github.com/tendermint/tendermint/libs/bech32"
 )
 
-func mapIncentiveClaimRewardToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func mapIncentiveClaimRewardToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent, err error) {
 	m, ok := msg.(incentive.MsgClaimReward)
 	if !ok {
 		return se, errors.New("Not a claim_reward type")
@@ -23,15 +23,18 @@ func mapIncentiveClaimRewardToSub(msg sdk.Msg) (se shared.SubsetEvent, err error
 		return se, fmt.Errorf("error converting Address: %w", err)
 	}
 
-	return shared.SubsetEvent{
+	se = shared.SubsetEvent{
 		Type:   []string{"claim_reward"},
 		Module: "incentive",
 		Node: map[string][]shared.Account{
 			"sender": {{ID: bech32Addr}},
-		}, // todo amount?
+		},
 		Additional: map[string][]string{
 			"multiplier_name": []string{m.MultiplierName},
 			"collateral_type": []string{m.CollateralType},
 		},
-	}, nil
+	}
+
+	err = produceTransfers(&se, "reward", logf)
+	return se, err
 }

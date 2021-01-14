@@ -13,7 +13,7 @@ import (
 	"github.com/tendermint/tendermint/libs/bech32"
 )
 
-func mapBep3CreateAtomicSwapToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func mapBep3CreateAtomicSwapToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent, err error) {
 	m, ok := msg.(bep3.MsgCreateAtomicSwap)
 	if !ok {
 		return se, errors.New("Not a createAtomicSwap type")
@@ -44,21 +44,10 @@ func mapBep3CreateAtomicSwapToSub(msg sdk.Msg) (se shared.SubsetEvent, err error
 		},
 	}
 
-	amts := make([]shared.TransactionAmount, len(m.Amount))
-	for i, amt := range m.Amount {
-		amts[i] = shared.TransactionAmount{
-			Currency: amt.Denom,
-			Numeric:  amt.Amount.BigInt(),
-			Text:     amt.String(),
-		}
-	}
+	// todo SubsetEvent.Amount is a single amount, so adding amounts to transfers instead
+	// do we want to make SubsetEvent.Amount an array?
 
-	se.Transfers = map[string][]shared.EventTransfer{
-		"send": []shared.EventTransfer{
-			{Amounts: amts},
-		},
-	}
-
+	err = produceTransfers(&se, "send", logf)
 	return se, nil
 }
 
@@ -67,7 +56,6 @@ func mapBep3ClaimAtomicSwapToSub(msg sdk.Msg) (se shared.SubsetEvent, err error)
 	if !ok {
 		return se, errors.New("Not a claimAtomicSwap type")
 	}
-	// todo get amount (from logs?)
 
 	bech32Addr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, m.From.Bytes())
 	if err != nil {
@@ -87,7 +75,7 @@ func mapBep3ClaimAtomicSwapToSub(msg sdk.Msg) (se shared.SubsetEvent, err error)
 	}, nil
 }
 
-func mapBep3RefundAtomicSwapToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func mapBep3RefundAtomicSwapToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent, err error) {
 	m, ok := msg.(bep3.MsgRefundAtomicSwap)
 	if !ok {
 		return se, errors.New("Not a refundAtomicSwap type")
@@ -98,7 +86,7 @@ func mapBep3RefundAtomicSwapToSub(msg sdk.Msg) (se shared.SubsetEvent, err error
 		return se, fmt.Errorf("error converting FromAddress: %w", err)
 	}
 
-	return shared.SubsetEvent{
+	se = shared.SubsetEvent{
 		Type:   []string{"refund_atomic_swap"},
 		Module: "bep3",
 		Node: map[string][]shared.Account{
@@ -107,5 +95,8 @@ func mapBep3RefundAtomicSwapToSub(msg sdk.Msg) (se shared.SubsetEvent, err error
 		Additional: map[string][]string{
 			"swap_id": []string{m.SwapID.String()},
 		},
-	}, nil
+	}
+
+	err = produceTransfers(&se, "send", logf)
+	return se, err
 }
