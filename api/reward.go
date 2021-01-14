@@ -13,12 +13,15 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
-	"github.com/cosmos/cosmos-sdk/x/distribution/types"
 )
 
-type responseWithHeight struct {
-	Height string                                   `json:"height"`
-	Result types.QueryDelegatorTotalRewardsResponse `json:"result"`
+// rewardResponse is kava response for querying /rewards
+type rewardResponse struct {
+	Height string       `json:"height"`
+	Result rewardResult `json:"result"`
+}
+type rewardResult struct {
+	Total sdk.DecCoins `json:"total"`
 }
 
 const maxRetries = 3
@@ -79,7 +82,7 @@ func (c *Client) GetReward(ctx context.Context, params structs.HeightAccount) (r
 		}
 		return resp, fmt.Errorf("[COSMOS-API] Error fetching rewards: %s ", result.Error)
 	}
-	var result responseWithHeight
+	var result rewardResponse
 	if err = decoder.Decode(&result); err != nil {
 		return resp, err
 	}
