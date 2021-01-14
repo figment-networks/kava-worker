@@ -22,7 +22,6 @@ func mapDistributionWithdrawValidatorCommissionToSub(msg sdk.Msg, logf LogFormat
 		return se, errors.New("Not a withdraw_validator_commission type")
 	}
 
-	//todo validator prefix?
 	bech32Addr, err := bech32.ConvertAndEncode(bech32ValPrefix, wvc.ValidatorAddress.Bytes())
 	if err != nil {
 		return se, fmt.Errorf("error converting ValidatorAddress: %w", err)
