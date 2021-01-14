@@ -13,7 +13,7 @@ import (
 	"github.com/tendermint/tendermint/libs/bech32"
 )
 
-const unbondedTokensPoolAddr = "cosmos1tygms3xhhs3yv487phx3dw4a95jn7t7lpm470r"
+const unbondedTokensPoolAddr = "kava1tygms3xhhs3yv487phx3dw4a95jn7t7lawprey"
 
 func mapStakingUndelegateToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent, err error) {
 	u, ok := msg.(staking.MsgUndelegate)
