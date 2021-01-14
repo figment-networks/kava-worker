@@ -43,8 +43,16 @@ If you wanna connect with manager running on docker instance add `HOSTNAME=host.
 
 ## Transaction Types
 List of currently supporter transaction types in kava-worker are (listed by modules):
+- auction:
+   `place_bid` 
 - bank:
     `multisend` , `send`
+- bep3:
+    `create_atomic_swap`, `claim_atomic_swap`, `refund_atomic_swap`
+- cdp:
+    `create_cdp`, `deposit_cdp`, `withdraw_cdp`, `draw_cdp`, `repay_cdp`
+- committee:
+ `commmittee_submit_proposal`, `committee_vote`
 - crisis:
     `verify_invariant`
 - distribution:
@@ -53,6 +61,14 @@ List of currently supporter transaction types in kava-worker are (listed by modu
     `submit_evidence`
 - gov:
     `deposit` , `vote` , `submit_proposal`
+- harvest:
+    `harvest_deposit`, `harvest_withdraw`, `claim_harvest_reward`
+- incentive: 
+    `claim_reward`
+- issuance:
+    `issue_tokens`, `redeem_tokens`, `block_address`, `unblock_address`, `change_pause_status`
+- pricefeed:
+    `post_price`
 - slashing:
     `unjail`
 - staking:
