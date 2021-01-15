@@ -1,4 +1,4 @@
-package api
+package mapper
 
 import (
 	"errors"
@@ -12,7 +12,7 @@ import (
 	"github.com/tendermint/tendermint/libs/bech32"
 )
 
-func mapCDPCreateCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func CDPCreateCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	m, ok := msg.(cdp.MsgCreateCDP)
 	if !ok {
 		return se, errors.New("Not a create_cdp type")
@@ -47,7 +47,7 @@ func mapCDPCreateCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	}, nil
 }
 
-func mapCDPDepositCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func CDPDepositCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	m, ok := msg.(cdp.MsgDeposit)
 	if !ok {
 		return se, errors.New("Not a deposit_cdp type")
@@ -83,7 +83,7 @@ func mapCDPDepositCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	}, nil
 }
 
-func mapCDPWithdrawCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func CDPWithdrawCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	m, ok := msg.(cdp.MsgWithdraw)
 	if !ok {
 		return se, errors.New("Not a withdraw_cdp type")
@@ -119,7 +119,7 @@ func mapCDPWithdrawCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	}, nil
 }
 
-func mapCDPDrawCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func CDPDrawCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	m, ok := msg.(cdp.MsgDrawDebt)
 	if !ok {
 		return se, errors.New("Not a draw_cdp type")
@@ -149,7 +149,7 @@ func mapCDPDrawCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	}, nil
 }
 
-func mapCDPRepayCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func CDPRepayCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	m, ok := msg.(cdp.MsgRepayDebt)
 	if !ok {
 		return se, errors.New("Not a repay_cdp type")

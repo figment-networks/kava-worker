@@ -1,4 +1,4 @@
-package api
+package mapper
 
 import (
 	"errors"
@@ -6,6 +6,7 @@ import (
 	"math/big"
 
 	shared "github.com/figment-networks/indexer-manager/structs"
+	"github.com/figment-networks/kava-worker/api/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	distribution "github.com/cosmos/cosmos-sdk/x/distribution"
@@ -16,7 +17,7 @@ import (
 
 var zero big.Int
 
-func mapDistributionWithdrawValidatorCommissionToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent, err error) {
+func DistributionWithdrawValidatorCommissionToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
 	wvc, ok := msg.(distribution.MsgWithdrawValidatorCommission)
 	if !ok {
 		return se, errors.New("Not a withdraw_validator_commission type")
@@ -40,7 +41,7 @@ func mapDistributionWithdrawValidatorCommissionToSub(msg sdk.Msg, logf LogFormat
 	return se, err
 }
 
-func mapDistributionSetWithdrawAddressToSub(msg sdk.Msg) (se shared.SubsetEvent, er error) {
+func DistributionSetWithdrawAddressToSub(msg sdk.Msg) (se shared.SubsetEvent, er error) {
 	swa, ok := msg.(distribution.MsgSetWithdrawAddress)
 	if !ok {
 		return se, errors.New("Not a set_withdraw_address type")
@@ -66,7 +67,7 @@ func mapDistributionSetWithdrawAddressToSub(msg sdk.Msg) (se shared.SubsetEvent,
 	}, nil
 }
 
-func mapDistributionWithdrawDelegatorRewardToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent, err error) {
+func DistributionWithdrawDelegatorRewardToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
 	wdr, ok := msg.(distribution.MsgWithdrawDelegatorReward)
 	if !ok {
 		return se, errors.New("Not a withdraw_validator_commission type")
@@ -96,7 +97,7 @@ func mapDistributionWithdrawDelegatorRewardToSub(msg sdk.Msg, logf LogFormat) (s
 	return se, err
 }
 
-func mapDistributionFundCommunityPoolToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent, er error) {
+func DistributionFundCommunityPoolToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, er error) {
 	fcp, ok := msg.(distributiontypes.MsgFundCommunityPool)
 	if !ok {
 		return se, errors.New("Not a withdraw_validator_commission type")

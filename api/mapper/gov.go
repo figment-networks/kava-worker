@@ -1,4 +1,4 @@
-package api
+package mapper
 
 import (
 	"errors"
@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	shared "github.com/figment-networks/indexer-manager/structs"
+	"github.com/figment-networks/kava-worker/api/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	gov "github.com/cosmos/cosmos-sdk/x/gov"
@@ -13,7 +14,7 @@ import (
 	"github.com/tendermint/tendermint/libs/bech32"
 )
 
-func mapGovDepositToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent, err error) {
+func GovDepositToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
 	dep, ok := msg.(gov.MsgDeposit)
 	if !ok {
 		return se, errors.New("Not a deposit type")
@@ -57,7 +58,7 @@ func mapGovDepositToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent, err
 	return se, err
 }
 
-func mapGovVoteToSub(msg sdk.Msg) (se shared.SubsetEvent, er error) {
+func GovVoteToSub(msg sdk.Msg) (se shared.SubsetEvent, er error) {
 	vote, ok := msg.(gov.MsgVote)
 	if !ok {
 		return se, errors.New("Not a vote type")
@@ -79,7 +80,7 @@ func mapGovVoteToSub(msg sdk.Msg) (se shared.SubsetEvent, er error) {
 	}, nil
 }
 
-func mapGovSubmitProposalToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent, err error) {
+func GovSubmitProposalToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
 	sp, ok := msg.(gov.MsgSubmitProposal)
 	if !ok {
 		return se, errors.New("Not a submit_proposal type")

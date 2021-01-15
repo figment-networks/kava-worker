@@ -1,4 +1,4 @@
-package api
+package mapper
 
 import (
 	"errors"
@@ -11,7 +11,7 @@ import (
 	"github.com/tendermint/tendermint/libs/bech32"
 )
 
-func mapSlashingUnjailToSub(msg sdk.Msg) (se shared.SubsetEvent, er error) {
+func SlashingUnjailToSub(msg sdk.Msg) (se shared.SubsetEvent, er error) {
 	unjail, ok := msg.(slashing.MsgUnjail)
 	if !ok {
 		return se, errors.New("Not an unjail type")

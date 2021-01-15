@@ -4,26 +4,26 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"math/big"
 	"net/http"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/figment-networks/indexer-manager/structs"
-	shared "github.com/figment-networks/indexer-manager/structs"
 	cStruct "github.com/figment-networks/indexer-manager/worker/connectivity/structs"
 	"github.com/figment-networks/indexing-engine/metrics"
-	"go.uber.org/zap"
+	"github.com/figment-networks/kava-worker/api/mapper"
+	"github.com/figment-networks/kava-worker/api/types"
+	"github.com/figment-networks/kava-worker/api/util"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	log "github.com/sirupsen/logrus"
+	"go.uber.org/zap"
 )
 
 // TxLogError Error message
@@ -32,8 +32,6 @@ type TxLogError struct {
 	Code      float64 `json:"code"`
 	Message   string  `json:"message"`
 }
-
-var curencyRegex = regexp.MustCompile("([0-9\\.\\,\\-\\s]+)([^0-9\\s]+)$")
 
 // SearchTx is making search api call
 func (c *Client) SearchTx(ctx context.Context, r structs.HeightRange, blocks map[uint64]structs.Block, out chan cStruct.OutResp, page, perPage int, fin chan string) {
@@ -102,7 +100,7 @@ func (c *Client) SearchTx(ctx context.Context, r structs.HeightRange, blocks map
 
 	decoder := json.NewDecoder(resp.Body)
 
-	result := &GetTxSearchResponse{}
+	result := &types.GetTxSearchResponse{}
 	if err = decoder.Decode(result); err != nil {
 		c.logger.Error("[COSMOS-API] unable to decode result body", zap.Error(err))
 		err := fmt.Errorf("unable to decode result body %w", err)
@@ -138,12 +136,12 @@ func (c *Client) SearchTx(ctx context.Context, r structs.HeightRange, blocks map
 }
 
 // transform raw data from cosmos into transaction format with augmentation from blocks
-func rawToTransaction(ctx context.Context, c *Client, in []TxResponse, blocks map[uint64]structs.Block, out chan cStruct.OutResp, logger *zap.Logger, cdc *codec.Codec) error {
+func rawToTransaction(ctx context.Context, c *Client, in []types.TxResponse, blocks map[uint64]structs.Block, out chan cStruct.OutResp, logger *zap.Logger, cdc *codec.Codec) error {
 	defer logger.Sync()
 	for _, txRaw := range in {
 		timer := metrics.NewTimer(transactionConversionDuration)
 		tx := &auth.StdTx{}
-		lf := []LogFormat{}
+		lf := []types.LogFormat{}
 		txErrs := []TxLogError{}
 
 		if err := json.Unmarshal([]byte(txRaw.TxResult.Log), &lf); err != nil {
@@ -226,151 +224,151 @@ func rawToTransaction(ctx context.Context, c *Client, in []TxResponse, blocks ma
 			case "auction":
 				switch msg.Type() {
 				case "place_bid":
-					ev, err = mapAuctionPlaceBidToSub(msg, logAtIndex)
+					ev, err = mapper.AuctionPlaceBidToSub(msg, logAtIndex)
 				default:
 					c.logger.Error("[COSMOS-API] Unknown auction message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
 				}
 			case "bank":
 				switch msg.Type() {
 				case "multisend":
-					ev, err = mapBankMultisendToSub(msg, logAtIndex)
+					ev, err = mapper.BankMultisendToSub(msg, logAtIndex)
 				case "send":
-					ev, err = mapBankSendToSub(msg, logAtIndex)
+					ev, err = mapper.BankSendToSub(msg, logAtIndex)
 				default:
 					c.logger.Error("[COSMOS-API] Unknown bank message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
 				}
 			case "bep3":
 				switch msg.Type() {
 				case "createAtomicSwap":
-					ev, err = mapBep3CreateAtomicSwapToSub(msg, logAtIndex)
+					ev, err = mapper.Bep3CreateAtomicSwapToSub(msg, logAtIndex)
 				case "claimAtomicSwap":
-					ev, err = mapBep3ClaimAtomicSwapToSub(msg)
+					ev, err = mapper.Bep3ClaimAtomicSwapToSub(msg)
 				case "refundAtomicSwap":
-					ev, err = mapBep3RefundAtomicSwapToSub(msg, logAtIndex)
+					ev, err = mapper.Bep3RefundAtomicSwapToSub(msg, logAtIndex)
 				default:
 					c.logger.Error("[COSMOS-API] Unknown bep3 message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
 				}
 			case "cdp":
 				switch msg.Type() {
 				case "create_cdp":
-					ev, err = mapCDPCreateCDPToSub(msg)
+					ev, err = mapper.CDPCreateCDPToSub(msg)
 				case "deposit_cdp":
-					ev, err = mapCDPDepositCDPToSub(msg)
+					ev, err = mapper.CDPDepositCDPToSub(msg)
 				case "withdraw_cdp":
-					ev, err = mapCDPWithdrawCDPToSub(msg)
+					ev, err = mapper.CDPWithdrawCDPToSub(msg)
 				case "draw_cdp":
-					ev, err = mapCDPDrawCDPToSub(msg)
+					ev, err = mapper.CDPDrawCDPToSub(msg)
 				case "repay_cdp":
-					ev, err = mapCDPRepayCDPToSub(msg)
+					ev, err = mapper.CDPRepayCDPToSub(msg)
 				default:
 					c.logger.Error("[COSMOS-API] Unknown cdp message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
 				}
 			case "committee":
 				switch msg.Type() {
 				case "commmittee_submit_proposal":
-					ev, err = mapCommitteeSubmitProposalToSub(msg)
+					ev, err = mapper.CommitteeSubmitProposalToSub(msg)
 				case "committee_vote":
-					ev, err = mapCommitteeVoteToSub(msg)
+					ev, err = mapper.CommitteeVoteToSub(msg)
 				default:
 					c.logger.Error("[COSMOS-API] Unknown committee message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
 				}
 			case "crisis":
 				switch msg.Type() {
 				case "verify_invariant":
-					ev, err = mapCrisisVerifyInvariantToSub(msg)
+					ev, err = mapper.CrisisVerifyInvariantToSub(msg)
 				default:
 					c.logger.Error("[COSMOS-API] Unknown crisis message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
 				}
 			case "distribution":
 				switch msg.Type() {
 				case "withdraw_validator_commission":
-					ev, err = mapDistributionWithdrawValidatorCommissionToSub(msg, logAtIndex)
+					ev, err = mapper.DistributionWithdrawValidatorCommissionToSub(msg, logAtIndex)
 				case "set_withdraw_address":
-					ev, err = mapDistributionSetWithdrawAddressToSub(msg)
+					ev, err = mapper.DistributionSetWithdrawAddressToSub(msg)
 				case "withdraw_delegator_reward":
-					ev, err = mapDistributionWithdrawDelegatorRewardToSub(msg, logAtIndex)
+					ev, err = mapper.DistributionWithdrawDelegatorRewardToSub(msg, logAtIndex)
 				case "fund_community_pool":
-					ev, err = mapDistributionFundCommunityPoolToSub(msg, logAtIndex)
+					ev, err = mapper.DistributionFundCommunityPoolToSub(msg, logAtIndex)
 				default:
 					c.logger.Error("[COSMOS-API] Unknown distribution message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
 				}
 			case "evidence":
 				switch msg.Type() {
 				case "submit_evidence":
-					ev, err = mapEvidenceSubmitEvidenceToSub(msg)
+					ev, err = mapper.EvidenceSubmitEvidenceToSub(msg)
 				default:
 					c.logger.Error("[COSMOS-API] Unknown evidence message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
 				}
 			case "gov":
 				switch msg.Type() {
 				case "deposit":
-					ev, err = mapGovDepositToSub(msg, logAtIndex)
+					ev, err = mapper.GovDepositToSub(msg, logAtIndex)
 				case "vote":
-					ev, err = mapGovVoteToSub(msg)
+					ev, err = mapper.GovVoteToSub(msg)
 				case "submit_proposal":
-					ev, err = mapGovSubmitProposalToSub(msg, logAtIndex)
+					ev, err = mapper.GovSubmitProposalToSub(msg, logAtIndex)
 				default:
 					c.logger.Error("[COSMOS-API] Unknown got message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
 				}
 			case "harvest":
 				switch msg.Type() {
 				case "harvest_deposit":
-					ev, err = mapHarvestDepositToSub(msg, logAtIndex)
+					ev, err = mapper.HarvestDepositToSub(msg, logAtIndex)
 				case "harvest_withdraw":
-					ev, err = mapHarvestWithdrawToSub(msg, logAtIndex)
+					ev, err = mapper.HarvestWithdrawToSub(msg, logAtIndex)
 				case "claim_harvest_reward":
-					ev, err = mapHarvestClaimRewardToSub(msg, logAtIndex)
+					ev, err = mapper.HarvestClaimRewardToSub(msg, logAtIndex)
 				default:
 					c.logger.Error("[COSMOS-API] Unknown harvest message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
 				}
 			case "incentive":
 				switch msg.Type() {
 				case "claim_reward":
-					ev, err = mapIncentiveClaimRewardToSub(msg, logAtIndex)
+					ev, err = mapper.IncentiveClaimRewardToSub(msg, logAtIndex)
 				default:
 					c.logger.Error("[COSMOS-API] Unknown pricefeed message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
 				}
 			case "issuance":
 				switch msg.Type() {
 				case "issue_tokens":
-					ev, err = mapIssuanceIssueTokensToSub(msg)
+					ev, err = mapper.IssuanceIssueTokensToSub(msg)
 				case "redeem_tokens":
-					ev, err = mapIssuanceRedeemTokensToSub(msg)
+					ev, err = mapper.IssuanceRedeemTokensToSub(msg)
 				case "block_address":
-					ev, err = mapIssuanceBlockAddressToSub(msg)
+					ev, err = mapper.IssuanceBlockAddressToSub(msg)
 				case "unblock_address":
-					ev, err = mapIssuanceUnblockAddressToSub(msg)
+					ev, err = mapper.IssuanceUnblockAddressToSub(msg)
 				case "change_pause_status":
-					ev, err = mapIssuanceMsgSetPauseStatusToSub(msg)
+					ev, err = mapper.IssuanceMsgSetPauseStatusToSub(msg)
 				default:
 					c.logger.Error("[COSMOS-API] Unknown pricefeed message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
 				}
 			case "pricefeed":
 				switch msg.Type() {
 				case "post_price":
-					ev, err = mapPricefeedPostPrice(msg)
+					ev, err = mapper.PricefeedPostPrice(msg)
 				default:
 					c.logger.Error("[COSMOS-API] Unknown pricefeed message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
 				}
 			case "slashing":
 				switch msg.Type() {
 				case "unjail":
-					ev, err = mapSlashingUnjailToSub(msg)
+					ev, err = mapper.SlashingUnjailToSub(msg)
 				default:
 					c.logger.Error("[COSMOS-API] Unknown slashing message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
 				}
 			case "staking":
 				switch msg.Type() {
 				case "begin_unbonding":
-					ev, err = mapStakingUndelegateToSub(msg, logAtIndex)
+					ev, err = mapper.StakingUndelegateToSub(msg, logAtIndex)
 				case "edit_validator":
-					ev, err = mapStakingEditValidatorToSub(msg)
+					ev, err = mapper.StakingEditValidatorToSub(msg)
 				case "create_validator":
-					ev, err = mapStakingCreateValidatorToSub(msg)
+					ev, err = mapper.StakingCreateValidatorToSub(msg)
 				case "delegate":
-					ev, err = mapStakingDelegateToSub(msg, logAtIndex)
+					ev, err = mapper.StakingDelegateToSub(msg, logAtIndex)
 				case "begin_redelegate":
-					ev, err = mapStakingBeginRedelegateToSub(msg, logAtIndex)
+					ev, err = mapper.StakingBeginRedelegateToSub(msg, logAtIndex)
 				default:
 					c.logger.Error("[COSMOS-API] Unknown staking message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
 				}
@@ -441,7 +439,7 @@ func rawToTransaction(ctx context.Context, c *Client, in []TxResponse, blocks ma
 					}
 
 					for index, amount := range attr.Amount {
-						sliced := getCurrency(amount)
+						sliced := util.GetCurrency(amount)
 
 						am := structs.TransactionAmount{
 							Text: amount,
@@ -455,9 +453,9 @@ func rawToTransaction(ctx context.Context, c *Client, in []TxResponse, blocks ma
 
 						if len(sliced) == 3 {
 							am.Currency = sliced[2]
-							c, exp, coinErr = getCoin(sliced[1])
+							c, exp, coinErr = util.GetCoin(sliced[1])
 						} else {
-							c, exp, coinErr = getCoin(amount)
+							c, exp, coinErr = util.GetCoin(amount)
 						}
 
 						if coinErr != nil {
@@ -503,27 +501,6 @@ func rawToTransaction(ctx context.Context, c *Client, in []TxResponse, blocks ma
 	return nil
 }
 
-func getCurrency(in string) []string {
-	return curencyRegex.FindStringSubmatch(in)
-}
-
-func getCoin(s string) (number *big.Int, exp int32, err error) {
-	s = strings.Replace(s, ",", ".", -1)
-	strs := strings.Split(s, `.`)
-	if len(strs) == 1 {
-		i := &big.Int{}
-		i.SetString(strs[0], 10)
-		return i, 0, nil
-	}
-	if len(strs) == 2 {
-		i := &big.Int{}
-		i.SetString(strs[0]+strs[1], 10)
-		return i, int32(len(strs[1])), nil
-	}
-
-	return number, 0, errors.New("Impossible to parse ")
-}
-
 // GetFromRaw returns raw data for plugin use;
 func (c *Client) GetFromRaw(logger *zap.Logger, txReader io.Reader) []map[string]interface{} {
 	tx := &auth.StdTx{}
@@ -543,9 +520,9 @@ func (c *Client) GetFromRaw(logger *zap.Logger, txReader io.Reader) []map[string
 	return slice
 }
 
-func findLog(lf []LogFormat, index int) LogFormat {
+func findLog(lf []types.LogFormat, index int) types.LogFormat {
 	if len(lf) <= index {
-		return LogFormat{}
+		return types.LogFormat{}
 	}
 	if l := lf[index]; l.MsgIndex == float64(index) {
 		return l
@@ -555,68 +532,5 @@ func findLog(lf []LogFormat, index int) LogFormat {
 			return l
 		}
 	}
-	return LogFormat{}
-}
-
-func produceTransfers(se *shared.SubsetEvent, transferType string, logf LogFormat) (err error) {
-	var evts []shared.EventTransfer
-	m := make(map[string][]shared.TransactionAmount)
-	for _, ev := range logf.Events {
-		if ev.Type != "transfer" {
-			continue
-		}
-
-		var latestRecipient string
-		for _, attr := range ev.Attributes {
-			if len(attr.Recipient) > 0 {
-				latestRecipient = attr.Recipient[0]
-			}
-
-			for _, amount := range attr.Amount {
-				attrAmt := shared.TransactionAmount{Numeric: &big.Int{}}
-				sliced := getCurrency(amount)
-				var (
-					c       *big.Int
-					exp     int32
-					coinErr error
-				)
-				if len(sliced) == 3 {
-					attrAmt.Currency = sliced[2]
-					c, exp, coinErr = getCoin(sliced[1])
-				} else {
-					c, exp, coinErr = getCoin(amount)
-				}
-				if coinErr != nil {
-					return fmt.Errorf("[COSMOS-API] Error parsing amount '%s': %s ", amount, coinErr)
-				}
-
-				attrAmt.Text = amount
-				attrAmt.Exp = exp
-				attrAmt.Numeric.Set(c)
-
-				m[latestRecipient] = append(m[latestRecipient], attrAmt)
-
-			}
-		}
-	}
-
-	for addr, amts := range m {
-		// todo should we include sender/recipient in EventTransfer?
-		// sender is available in kava logs
-		evts = append(evts, shared.EventTransfer{
-			Amounts: amts,
-			Account: shared.Account{ID: addr},
-		})
-	}
-
-	if len(evts) <= 0 {
-		return
-	}
-
-	if se.Transfers[transferType] == nil {
-		se.Transfers = make(map[string][]shared.EventTransfer)
-	}
-	se.Transfers[transferType] = evts
-
-	return
+	return types.LogFormat{}
 }

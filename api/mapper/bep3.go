@@ -1,4 +1,4 @@
-package api
+package mapper
 
 import (
 	"errors"
@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	shared "github.com/figment-networks/indexer-manager/structs"
+	"github.com/figment-networks/kava-worker/api/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/kava-labs/kava/app"
@@ -13,7 +14,7 @@ import (
 	"github.com/tendermint/tendermint/libs/bech32"
 )
 
-func mapBep3CreateAtomicSwapToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent, err error) {
+func Bep3CreateAtomicSwapToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
 	m, ok := msg.(bep3.MsgCreateAtomicSwap)
 	if !ok {
 		return se, errors.New("Not a createAtomicSwap type")
@@ -66,7 +67,7 @@ func mapBep3CreateAtomicSwapToSub(msg sdk.Msg, logf LogFormat) (se shared.Subset
 	return se, nil
 }
 
-func mapBep3ClaimAtomicSwapToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func Bep3ClaimAtomicSwapToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	m, ok := msg.(bep3.MsgClaimAtomicSwap)
 	if !ok {
 		return se, errors.New("Not a claimAtomicSwap type")
@@ -90,7 +91,7 @@ func mapBep3ClaimAtomicSwapToSub(msg sdk.Msg) (se shared.SubsetEvent, err error)
 	}, nil
 }
 
-func mapBep3RefundAtomicSwapToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent, err error) {
+func Bep3RefundAtomicSwapToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
 	m, ok := msg.(bep3.MsgRefundAtomicSwap)
 	if !ok {
 		return se, errors.New("Not a refundAtomicSwap type")

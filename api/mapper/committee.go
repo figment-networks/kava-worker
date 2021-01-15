@@ -1,4 +1,4 @@
-package api
+package mapper
 
 import (
 	"errors"
@@ -13,7 +13,7 @@ import (
 	"github.com/tendermint/tendermint/libs/bech32"
 )
 
-func mapCommitteeSubmitProposalToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func CommitteeSubmitProposalToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	m, ok := msg.(committee.MsgSubmitProposal)
 	if !ok {
 		return se, errors.New("Not a commmittee_submit_proposal type")
@@ -53,7 +53,7 @@ func mapCommitteeSubmitProposalToSub(msg sdk.Msg) (se shared.SubsetEvent, err er
 	return se, nil
 }
 
-func mapCommitteeVoteToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func CommitteeVoteToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	m, ok := msg.(committee.MsgVote)
 	if !ok {
 		return se, errors.New("Not a committee_vote type")

@@ -1,10 +1,11 @@
-package api
+package mapper
 
 import (
 	"errors"
 	"fmt"
 
 	shared "github.com/figment-networks/indexer-manager/structs"
+	"github.com/figment-networks/kava-worker/api/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/kava-labs/kava/app"
@@ -12,7 +13,7 @@ import (
 	"github.com/tendermint/tendermint/libs/bech32"
 )
 
-func mapHarvestDepositToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent, err error) {
+func HarvestDepositToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
 	m, ok := msg.(harvest.MsgDeposit)
 	if !ok {
 		return se, errors.New("Not a harvest_deposit type")
@@ -45,7 +46,7 @@ func mapHarvestDepositToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent,
 	return se, err
 }
 
-func mapHarvestWithdrawToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent, err error) {
+func HarvestWithdrawToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
 	m, ok := msg.(harvest.MsgWithdraw)
 	if !ok {
 		return se, errors.New("Not a harvest_withdraw type")
@@ -78,7 +79,7 @@ func mapHarvestWithdrawToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent
 	return se, err
 }
 
-func mapHarvestClaimRewardToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent, err error) {
+func HarvestClaimRewardToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
 	m, ok := msg.(harvest.MsgClaimReward)
 	if !ok {
 		return se, errors.New("Not a claim_harvest_reward type")

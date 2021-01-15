@@ -1,4 +1,4 @@
-package api
+package mapper
 
 import (
 	"errors"
@@ -13,7 +13,7 @@ import (
 	"github.com/tendermint/tendermint/libs/bech32"
 )
 
-func mapIssuanceIssueTokensToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func IssuanceIssueTokensToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	m, ok := msg.(issuance.MsgIssueTokens)
 	if !ok {
 		return se, errors.New("Not a issue_tokens type")
@@ -46,7 +46,7 @@ func mapIssuanceIssueTokensToSub(msg sdk.Msg) (se shared.SubsetEvent, err error)
 	}, nil
 }
 
-func mapIssuanceRedeemTokensToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func IssuanceRedeemTokensToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	m, ok := msg.(issuance.MsgRedeemTokens)
 	if !ok {
 		return se, errors.New("Not a redeem_tokens type")
@@ -73,7 +73,7 @@ func mapIssuanceRedeemTokensToSub(msg sdk.Msg) (se shared.SubsetEvent, err error
 	}, nil
 }
 
-func mapIssuanceBlockAddressToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func IssuanceBlockAddressToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	m, ok := msg.(issuance.MsgBlockAddress)
 	if !ok {
 		return se, errors.New("Not a block_address type")
@@ -102,7 +102,7 @@ func mapIssuanceBlockAddressToSub(msg sdk.Msg) (se shared.SubsetEvent, err error
 	}, nil
 }
 
-func mapIssuanceUnblockAddressToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func IssuanceUnblockAddressToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	m, ok := msg.(issuance.MsgBlockAddress)
 	if !ok {
 		return se, errors.New("Not a unblock_address type")
@@ -131,7 +131,7 @@ func mapIssuanceUnblockAddressToSub(msg sdk.Msg) (se shared.SubsetEvent, err err
 	}, nil
 }
 
-func mapIssuanceMsgSetPauseStatusToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func IssuanceMsgSetPauseStatusToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	m, ok := msg.(issuance.MsgSetPauseStatus)
 	if !ok {
 		return se, errors.New("Not a change_pause_status type")

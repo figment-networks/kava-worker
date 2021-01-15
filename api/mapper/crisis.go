@@ -1,4 +1,4 @@
-package api
+package mapper
 
 import (
 	"errors"
@@ -12,7 +12,7 @@ import (
 	"github.com/tendermint/tendermint/libs/bech32"
 )
 
-func mapCrisisVerifyInvariantToSub(msg sdk.Msg) (se shared.SubsetEvent, er error) {
+func CrisisVerifyInvariantToSub(msg sdk.Msg) (se shared.SubsetEvent, er error) {
 	mvi, ok := msg.(crisis.MsgVerifyInvariant)
 	if !ok {
 		return se, errors.New("Not a verify_invariant type")

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 	"sync"
 	"time"
@@ -26,6 +27,8 @@ type Client struct {
 
 // NewClient returns a new client for a given endpoint
 func NewClient(url, key string, logger *zap.Logger, c *http.Client, reqPerSecLimit int) *Client {
+	fmt.Println("[NewClient]")
+
 	if c == nil {
 		c = &http.Client{
 			Timeout: time.Second * 10,
