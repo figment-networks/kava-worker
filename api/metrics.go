@@ -5,7 +5,7 @@ import "github.com/figment-networks/indexing-engine/metrics"
 var (
 	conversionDuration = metrics.MustNewHistogramWithTags(metrics.HistogramOptions{
 		Namespace: "indexers",
-		Subsystem: "worker_api_cosmos",
+		Subsystem: "worker_api_kava",
 		Name:      "conversion_duration",
 		Desc:      "Duration how long it takes to convert from raw to format",
 		Tags:      []string{"type"},
@@ -13,7 +13,7 @@ var (
 
 	rawRequestDuration = metrics.MustNewHistogramWithTags(metrics.HistogramOptions{
 		Namespace: "indexers",
-		Subsystem: "worker_api_cosmos",
+		Subsystem: "worker_api_kava",
 		Name:      "request_duration",
 		Desc:      "Duration how long it takes to take data from cosmos",
 		Tags:      []string{"endpoint", "status"},
@@ -21,7 +21,7 @@ var (
 
 	numberOfItems = metrics.MustNewHistogramWithTags(metrics.HistogramOptions{
 		Namespace: "indexers",
-		Subsystem: "worker_api_cosmos",
+		Subsystem: "worker_api_kava",
 		Name:      "number_of_items",
 		Desc:      "Number of all transactions returned from one request",
 		Tags:      []string{"type"},
@@ -29,7 +29,7 @@ var (
 
 	blockCacheEfficiency = metrics.MustNewCounterWithTags(metrics.Options{
 		Namespace: "indexers",
-		Subsystem: "worker_api_cosmos",
+		Subsystem: "worker_api_kava",
 		Name:      "block_cache_efficiency",
 		Desc:      "How Efficient the shared block cache is",
 		Tags:      []string{"cache"},
