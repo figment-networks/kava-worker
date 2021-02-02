@@ -19,7 +19,7 @@ jobs:
           go-version: 1.15
 
       - name: Build and pack kava worker binary with libs
-        run: make pack-release-with-libs
+        run: make pack-release
 
       - name: Set ref vars
         id: refs

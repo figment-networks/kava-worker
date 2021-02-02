@@ -26,10 +26,10 @@ build: LDFLAGS += -X $(MODULE)/cmd/worker-kava/config.GitSHA=$(GIT_SHA)
 build:
 	go build -o worker -ldflags '$(LDFLAGS)'  ./cmd/worker-kava
 
-# .PHONY: pack-release
-# pack-release:
-# 	@mkdir -p ./release
-# 	@make build
-# 	@mv ./worker ./release/worker
-# 	@zip -r kava-worker ./release
-# 	@rm -rf ./release
+.PHONY: pack-release
+pack-release:
+	@mkdir -p ./release
+	@make build
+	@mv ./worker ./release/worker
+	@zip -r kava-worker ./release
+	@rm -rf ./release
