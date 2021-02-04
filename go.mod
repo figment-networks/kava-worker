@@ -2,12 +2,10 @@ module github.com/figment-networks/kava-worker
 
 go 1.15
 
-replace github.com/figment-networks/indexer-manager => /Users/pacmessica/.go/src/github.com/figment-networks/indexer-manager
-
 require (
 	github.com/bearcherian/rollzap v1.0.2
 	github.com/cosmos/cosmos-sdk v0.39.2
-	github.com/figment-networks/indexer-manager v0.0.8
+	github.com/figment-networks/indexer-manager v0.0.9
 	github.com/figment-networks/indexing-engine v0.1.14
 	github.com/google/uuid v1.1.4
 	github.com/kava-labs/kava v0.12.1
