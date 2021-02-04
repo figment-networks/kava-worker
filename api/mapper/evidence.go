@@ -1,4 +1,4 @@
-package api
+package mapper
 
 import (
 	"errors"
@@ -13,7 +13,7 @@ import (
 	"github.com/tendermint/tendermint/libs/bech32"
 )
 
-func mapEvidenceSubmitEvidenceToSub(msg sdk.Msg) (se shared.SubsetEvent, er error) {
+func EvidenceSubmitEvidenceToSub(msg sdk.Msg) (se shared.SubsetEvent, er error) {
 	mse, ok := msg.(evidence.MsgSubmitEvidence)
 	if !ok {
 		return se, errors.New("Not a submit_evidence type")

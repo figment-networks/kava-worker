@@ -1,4 +1,4 @@
-package api
+package mapper
 
 import (
 	"errors"
@@ -6,6 +6,8 @@ import (
 	"math/big"
 
 	shared "github.com/figment-networks/indexer-manager/structs"
+	"github.com/figment-networks/kava-worker/api/types"
+	"github.com/figment-networks/kava-worker/api/util"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	staking "github.com/cosmos/cosmos-sdk/x/staking"
@@ -15,7 +17,7 @@ import (
 
 const unbondedTokensPoolAddr = "kava1tygms3xhhs3yv487phx3dw4a95jn7t7lawprey"
 
-func mapStakingUndelegateToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent, err error) {
+func StakingUndelegateToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
 	u, ok := msg.(staking.MsgUndelegate)
 	if !ok {
 		return se, errors.New("Not a begin_unbonding type")
@@ -66,7 +68,7 @@ func mapStakingUndelegateToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEve
 
 			for _, amount := range attr.Amount {
 				attrAmt := shared.TransactionAmount{Numeric: &big.Int{}}
-				sliced := getCurrency(amount)
+				sliced := util.GetCurrency(amount)
 				var (
 					c       *big.Int
 					exp     int32
@@ -74,9 +76,9 @@ func mapStakingUndelegateToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEve
 				)
 				if len(sliced) == 3 {
 					attrAmt.Currency = sliced[2]
-					c, exp, coinErr = getCoin(sliced[1])
+					c, exp, coinErr = util.GetCoin(sliced[1])
 				} else {
-					c, exp, coinErr = getCoin(amount)
+					c, exp, coinErr = util.GetCoin(amount)
 				}
 				if coinErr != nil {
 					return se, fmt.Errorf("[COSMOS-API] Error parsing amount '%s': %s ", amount, coinErr)
@@ -104,7 +106,7 @@ func mapStakingUndelegateToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEve
 	return se, nil
 }
 
-func mapStakingDelegateToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent, err error) {
+func StakingDelegateToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
 	d, ok := msg.(staking.MsgDelegate)
 	if !ok {
 		return se, errors.New("Not a delegate type")
@@ -140,7 +142,7 @@ func mapStakingDelegateToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent
 	return se, err
 }
 
-func mapStakingBeginRedelegateToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent, err error) {
+func StakingBeginRedelegateToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
 	br, ok := msg.(staking.MsgBeginRedelegate)
 	if !ok {
 		return se, errors.New("Not a begin_redelegate type")
@@ -182,7 +184,7 @@ func mapStakingBeginRedelegateToSub(msg sdk.Msg, logf LogFormat) (se shared.Subs
 	return se, err
 }
 
-func mapStakingCreateValidatorToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func StakingCreateValidatorToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	ev, ok := msg.(staking.MsgCreateValidator)
 	if !ok {
 		return se, errors.New("Not a create_validator type")
@@ -239,7 +241,7 @@ func mapStakingCreateValidatorToSub(msg sdk.Msg) (se shared.SubsetEvent, err err
 	}, err
 }
 
-func mapStakingEditValidatorToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func StakingEditValidatorToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	ev, ok := msg.(staking.MsgEditValidator)
 	if !ok {
 		return se, errors.New("Not a edit_validator type")

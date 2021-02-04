@@ -1,10 +1,11 @@
-package api
+package mapper
 
 import (
 	"errors"
 	"fmt"
 
 	shared "github.com/figment-networks/indexer-manager/structs"
+	"github.com/figment-networks/kava-worker/api/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/kava-labs/kava/app"
@@ -12,7 +13,7 @@ import (
 	"github.com/tendermint/tendermint/libs/bech32"
 )
 
-func mapIncentiveClaimRewardToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent, err error) {
+func IncentiveClaimRewardToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
 	m, ok := msg.(incentive.MsgClaimReward)
 	if !ok {
 		return se, errors.New("Not a claim_reward type")

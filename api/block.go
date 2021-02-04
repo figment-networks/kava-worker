@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/figment-networks/indexer-manager/structs"
+	"github.com/figment-networks/kava-worker/api/types"
 )
 
 // BlocksMap map of blocks to control block map
@@ -71,7 +72,7 @@ func (c Client) GetBlock(ctx context.Context, params structs.HeightHash) (block 
 
 	decoder := json.NewDecoder(resp.Body)
 
-	var result *GetBlockResponse
+	var result *types.GetBlockResponse
 	if err = decoder.Decode(&result); err != nil {
 		return block, err
 	}
@@ -145,7 +146,7 @@ func (c Client) GetBlockAsync(ctx context.Context, in chan uint64, out chan<- Bl
 
 		decoder := json.NewDecoder(resp.Body)
 
-		var result *GetBlockResponse
+		var result *types.GetBlockResponse
 		err = decoder.Decode(&result)
 
 		resp.Body.Close()
@@ -223,7 +224,7 @@ func (c Client) GetBlocksMeta(ctx context.Context, params structs.HeightRange, b
 
 	decoder := json.NewDecoder(resp.Body)
 
-	var result *GetBlockchainResponse
+	var result *types.GetBlockchainResponse
 	if err = decoder.Decode(&result); err != nil {
 		end <- err
 		return

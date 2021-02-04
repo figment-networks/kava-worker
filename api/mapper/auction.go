@@ -1,4 +1,4 @@
-package api
+package mapper
 
 import (
 	"errors"
@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	shared "github.com/figment-networks/indexer-manager/structs"
+	"github.com/figment-networks/kava-worker/api/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/kava-labs/kava/app"
@@ -13,7 +14,7 @@ import (
 	"github.com/tendermint/tendermint/libs/bech32"
 )
 
-func mapAuctionPlaceBidToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent, err error) {
+func AuctionPlaceBidToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
 	m, ok := msg.(auction.MsgPlaceBid)
 	if !ok {
 		return se, errors.New("Not a place_bid type")

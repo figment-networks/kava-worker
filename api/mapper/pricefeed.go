@@ -1,4 +1,4 @@
-package api
+package mapper
 
 import (
 	"errors"
@@ -12,7 +12,7 @@ import (
 	"github.com/tendermint/tendermint/libs/bech32"
 )
 
-func mapPricefeedPostPrice(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func PricefeedPostPrice(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	m, ok := msg.(pricefeed.MsgPostPrice)
 	if !ok {
 		return se, errors.New("Not a post_price type")

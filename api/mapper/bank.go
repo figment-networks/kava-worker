@@ -1,10 +1,11 @@
-package api
+package mapper
 
 import (
 	"errors"
 	"fmt"
 
 	shared "github.com/figment-networks/indexer-manager/structs"
+	"github.com/figment-networks/kava-worker/api/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	bank "github.com/cosmos/cosmos-sdk/x/bank"
@@ -12,7 +13,7 @@ import (
 	"github.com/tendermint/tendermint/libs/bech32"
 )
 
-func mapBankMultisendToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent, err error) {
+func BankMultisendToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
 
 	multisend, ok := msg.(bank.MsgMultiSend)
 	if !ok {
@@ -43,7 +44,7 @@ func mapBankMultisendToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent, 
 	return se, err
 }
 
-func mapBankSendToSub(msg sdk.Msg, logf LogFormat) (se shared.SubsetEvent, err error) {
+func BankSendToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
 	send, ok := msg.(bank.MsgSend)
 	if !ok {
 		return se, errors.New("Not a send type")
