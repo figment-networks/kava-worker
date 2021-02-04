@@ -29,12 +29,14 @@ Worker also need some basic config:
 
 ```bash
     MANAGERS=0.0.0.0:8085
-    TENDERMINT_RPC_ADDR=https://cosmoshub-3--rpc--archive.datahub.figment.io
+    TENDERMINT_RPC_ADDR=https://kava-3--rpc--archive.datahub.figment.io
+    TENDERMINT_LCD_ADDR=https://kava-3--rpc--archive.datahub.figment.io
     CHAIN_ID=kava-3
 ```
 
 Where
     - `TENDERMINT_RPC_ADDR` is a http address to node's RPC endpoint
+    - `TENDERMINT_LCD_ADDR` is a http address to node's LCD endpoint
     - `MANAGERS` a comma-separated list of manager ip:port addresses that worker will connect to. In this case only one
 
 After running both binaries worker should successfully register itself to the manager.
