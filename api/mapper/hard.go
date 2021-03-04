@@ -119,7 +119,7 @@ func HardRepayToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, e
 func HardLiquidateToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
 	m, ok := msg.(hard.MsgLiquidate)
 	if !ok {
-		return se, errors.New("Not a hard_repay type")
+		return se, errors.New("Not a hard_liquidate type")
 	}
 
 	bech32Addr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, m.Keeper.Bytes())
@@ -133,7 +133,7 @@ func HardLiquidateToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEven
 	}
 
 	se = shared.SubsetEvent{
-		Type:   []string{"hard_repay"},
+		Type:   []string{"hard_liquidate"},
 		Module: "hard",
 		Node: map[string][]shared.Account{
 			"keeper":   {{ID: bech32Addr}},
