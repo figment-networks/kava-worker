@@ -133,7 +133,7 @@ func HardLiquidateToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEven
 	}
 
 	se = shared.SubsetEvent{
-		Type:   []string{"hard_repay"},
+		Type:   []string{"hard_liquidate"},
 		Module: "hard",
 		Node: map[string][]shared.Account{
 			"keeper":   {{ID: bech32Addr}},
