@@ -1,5 +1,6 @@
 package mapper
 
+/*
 import (
 	"errors"
 	"fmt"
@@ -9,10 +10,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/kava-labs/kava/app"
-	"github.com/kava-labs/kava/x/harvest"
 	"github.com/tendermint/tendermint/libs/bech32"
 )
-
 func HarvestDepositToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
 	m, ok := msg.(harvest.MsgDeposit)
 	if !ok {
@@ -112,3 +111,4 @@ func HarvestClaimRewardToSub(msg sdk.Msg, logf types.LogFormat) (se shared.Subse
 	err = produceTransfers(&se, "reward", logf)
 	return se, err
 }
+*/

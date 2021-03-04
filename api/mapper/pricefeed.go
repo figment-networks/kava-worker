@@ -37,7 +37,7 @@ func PricefeedPostPrice(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 			},
 		},
 		Additional: map[string][]string{
-			"expiry": []string{m.Expiry.String()},
+			"expiry": {m.Expiry.String()},
 		},
 	}, nil
 }

@@ -260,6 +260,8 @@ func rawToTransaction(ctx context.Context, c *Client, in []types.TxResponse, blo
 					ev, err = mapper.CDPDrawCDPToSub(msg)
 				case "repay_cdp":
 					ev, err = mapper.CDPRepayCDPToSub(msg)
+				case "liquidate": // (lukanus): yes this doesn't have _cdp
+					ev, err = mapper.CDPLiquidateToSub(msg)
 				default:
 					c.logger.Error("[COSMOS-API] Unknown cdp message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
 				}
@@ -310,23 +312,29 @@ func rawToTransaction(ctx context.Context, c *Client, in []types.TxResponse, blo
 				default:
 					c.logger.Error("[COSMOS-API] Unknown got message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
 				}
-			case "harvest":
+			case "hard":
 				switch msg.Type() {
-				case "harvest_deposit":
-					ev, err = mapper.HarvestDepositToSub(msg, logAtIndex)
-				case "harvest_withdraw":
-					ev, err = mapper.HarvestWithdrawToSub(msg, logAtIndex)
-				case "claim_harvest_reward":
-					ev, err = mapper.HarvestClaimRewardToSub(msg, logAtIndex)
+				case "hard_deposit":
+					ev, err = mapper.HardDepositToSub(msg, logAtIndex)
+				case "hard_withdraw":
+					ev, err = mapper.HardWithdrawToSub(msg, logAtIndex)
+				case "hard_borrow":
+					ev, err = mapper.HardBorrowToSub(msg, logAtIndex)
+				case "hard_liquidate":
+					ev, err = mapper.HardLiquidateToSub(msg, logAtIndex)
+				case "hard_repay":
+					ev, err = mapper.HardRepayToSub(msg, logAtIndex)
 				default:
-					c.logger.Error("[COSMOS-API] Unknown harvest message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
+					c.logger.Error("[COSMOS-API] Unknown hard message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
 				}
 			case "incentive":
 				switch msg.Type() {
-				case "claim_reward":
-					ev, err = mapper.IncentiveClaimRewardToSub(msg, logAtIndex)
+				case "claim_hard_liquidity_provider_reward":
+					ev, err = mapper.IncentiveClaimHardLiquidityProviderRewardToSub(msg, logAtIndex)
+				case "claim_usdx_minting_reward":
+					ev, err = mapper.IncentiveClaimUSDXMintingRewardToSub(msg, logAtIndex)
 				default:
-					c.logger.Error("[COSMOS-API] Unknown pricefeed message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
+					c.logger.Error("[COSMOS-API] Unknown incentive message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
 				}
 			case "issuance":
 				switch msg.Type() {
@@ -341,7 +349,7 @@ func rawToTransaction(ctx context.Context, c *Client, in []types.TxResponse, blo
 				case "change_pause_status":
 					ev, err = mapper.IssuanceMsgSetPauseStatusToSub(msg)
 				default:
-					c.logger.Error("[COSMOS-API] Unknown pricefeed message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
+					c.logger.Error("[COSMOS-API] Unknown issuance message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
 				}
 			case "pricefeed":
 				switch msg.Type() {
