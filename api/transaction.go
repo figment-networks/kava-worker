@@ -224,7 +224,7 @@ func rawToTransaction(ctx context.Context, c *Client, in []types.TxResponse, blo
 				case "place_bid":
 					ev, err = mapper.AuctionPlaceBidToSub(msg, logAtIndex)
 				default:
-					c.logger.Error("[COSMOS-API] Unknown auction message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
+					c.logger.Error("[COSMOS-API] Unknown auction message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()), zap.String("height", txRaw.Height))
 				}
 			case "bank":
 				switch msg.Type() {
@@ -233,7 +233,7 @@ func rawToTransaction(ctx context.Context, c *Client, in []types.TxResponse, blo
 				case "send":
 					ev, err = mapper.BankSendToSub(msg, logAtIndex)
 				default:
-					c.logger.Error("[COSMOS-API] Unknown bank message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
+					c.logger.Error("[COSMOS-API] Unknown bank message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()), zap.String("height", txRaw.Height))
 				}
 			case "bep3":
 				switch msg.Type() {
@@ -244,7 +244,7 @@ func rawToTransaction(ctx context.Context, c *Client, in []types.TxResponse, blo
 				case "refundAtomicSwap":
 					ev, err = mapper.Bep3RefundAtomicSwapToSub(msg, logAtIndex)
 				default:
-					c.logger.Error("[COSMOS-API] Unknown bep3 message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
+					c.logger.Error("[COSMOS-API] Unknown bep3 message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()), zap.String("height", txRaw.Height))
 				}
 			case "cdp":
 				switch msg.Type() {
@@ -261,7 +261,7 @@ func rawToTransaction(ctx context.Context, c *Client, in []types.TxResponse, blo
 				case "liquidate": // (lukanus): yes this doesn't have _cdp
 					ev, err = mapper.CDPLiquidateToSub(msg)
 				default:
-					c.logger.Error("[COSMOS-API] Unknown cdp message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
+					c.logger.Error("[COSMOS-API] Unknown cdp message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()), zap.String("height", txRaw.Height))
 				}
 			case "committee":
 				switch msg.Type() {
@@ -270,14 +270,14 @@ func rawToTransaction(ctx context.Context, c *Client, in []types.TxResponse, blo
 				case "committee_vote":
 					ev, err = mapper.CommitteeVoteToSub(msg)
 				default:
-					c.logger.Error("[COSMOS-API] Unknown committee message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
+					c.logger.Error("[COSMOS-API] Unknown committee message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()), zap.String("height", txRaw.Height))
 				}
 			case "crisis":
 				switch msg.Type() {
 				case "verify_invariant":
 					ev, err = mapper.CrisisVerifyInvariantToSub(msg)
 				default:
-					c.logger.Error("[COSMOS-API] Unknown crisis message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
+					c.logger.Error("[COSMOS-API] Unknown crisis message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()), zap.String("height", txRaw.Height))
 				}
 			case "distribution":
 				switch msg.Type() {
@@ -290,14 +290,14 @@ func rawToTransaction(ctx context.Context, c *Client, in []types.TxResponse, blo
 				case "fund_community_pool":
 					ev, err = mapper.DistributionFundCommunityPoolToSub(msg, logAtIndex)
 				default:
-					c.logger.Error("[COSMOS-API] Unknown distribution message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
+					c.logger.Error("[COSMOS-API] Unknown distribution message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()), zap.String("height", txRaw.Height))
 				}
 			case "evidence":
 				switch msg.Type() {
 				case "submit_evidence":
 					ev, err = mapper.EvidenceSubmitEvidenceToSub(msg)
 				default:
-					c.logger.Error("[COSMOS-API] Unknown evidence message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
+					c.logger.Error("[COSMOS-API] Unknown evidence message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()), zap.String("height", txRaw.Height))
 				}
 			case "gov":
 				switch msg.Type() {
@@ -308,7 +308,7 @@ func rawToTransaction(ctx context.Context, c *Client, in []types.TxResponse, blo
 				case "submit_proposal":
 					ev, err = mapper.GovSubmitProposalToSub(msg, logAtIndex)
 				default:
-					c.logger.Error("[COSMOS-API] Unknown got message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
+					c.logger.Error("[COSMOS-API] Unknown got message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()), zap.String("height", txRaw.Height))
 				}
 			case "hard":
 				switch msg.Type() {
@@ -323,7 +323,7 @@ func rawToTransaction(ctx context.Context, c *Client, in []types.TxResponse, blo
 				case "hard_repay":
 					ev, err = mapper.HardRepayToSub(msg, logAtIndex)
 				default:
-					c.logger.Error("[COSMOS-API] Unknown hard message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
+					c.logger.Error("[COSMOS-API] Unknown hard message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()), zap.String("height", txRaw.Height))
 				}
 			case "incentive":
 				switch msg.Type() {
@@ -332,7 +332,7 @@ func rawToTransaction(ctx context.Context, c *Client, in []types.TxResponse, blo
 				case "claim_usdx_minting_reward":
 					ev, err = mapper.IncentiveClaimUSDXMintingRewardToSub(msg, logAtIndex)
 				default:
-					c.logger.Error("[COSMOS-API] Unknown incentive message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
+					c.logger.Error("[COSMOS-API] Unknown incentive message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()), zap.String("height", txRaw.Height))
 				}
 			case "issuance":
 				switch msg.Type() {
@@ -347,21 +347,21 @@ func rawToTransaction(ctx context.Context, c *Client, in []types.TxResponse, blo
 				case "change_pause_status":
 					ev, err = mapper.IssuanceMsgSetPauseStatusToSub(msg)
 				default:
-					c.logger.Error("[COSMOS-API] Unknown issuance message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
+					c.logger.Error("[COSMOS-API] Unknown issuance message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()), zap.String("height", txRaw.Height))
 				}
 			case "pricefeed":
 				switch msg.Type() {
 				case "post_price":
 					ev, err = mapper.PricefeedPostPrice(msg)
 				default:
-					c.logger.Error("[COSMOS-API] Unknown pricefeed message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
+					c.logger.Error("[COSMOS-API] Unknown pricefeed message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()), zap.String("height", txRaw.Height))
 				}
 			case "slashing":
 				switch msg.Type() {
 				case "unjail":
 					ev, err = mapper.SlashingUnjailToSub(msg)
 				default:
-					c.logger.Error("[COSMOS-API] Unknown slashing message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
+					c.logger.Error("[COSMOS-API] Unknown slashing message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()), zap.String("height", txRaw.Height))
 				}
 			case "staking":
 				switch msg.Type() {
@@ -376,10 +376,10 @@ func rawToTransaction(ctx context.Context, c *Client, in []types.TxResponse, blo
 				case "begin_redelegate":
 					ev, err = mapper.StakingBeginRedelegateToSub(msg, logAtIndex)
 				default:
-					c.logger.Error("[COSMOS-API] Unknown staking message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
+					c.logger.Error("[COSMOS-API] Unknown staking message Type ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()), zap.String("height", txRaw.Height))
 				}
 			default:
-				c.logger.Error("[COSMOS-API] Unknown message Route ", zap.Error(err), zap.String("route", msg.Route()), zap.String("type", msg.Type()))
+				c.logger.Error("[COSMOS-API] Unknown message Route ", zap.Error(err), zap.String("route", msg.Route()), zap.String("type", msg.Type()), zap.String("height", txRaw.Height))
 			}
 
 			if len(ev.Type) > 0 {
@@ -388,7 +388,7 @@ func rawToTransaction(ctx context.Context, c *Client, in []types.TxResponse, blo
 			}
 
 			if err != nil {
-				c.logger.Error("[COSMOS-API] Problem decoding transaction ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()))
+				c.logger.Error("[COSMOS-API] Problem decoding transaction ", zap.Error(err), zap.String("type", msg.Type()), zap.String("route", msg.Route()), zap.String("height", txRaw.Height))
 			}
 
 			presentIndexes[tev.ID] = true
