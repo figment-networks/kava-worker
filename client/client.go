@@ -221,10 +221,7 @@ func (ic *IndexerClient) GetBlock(ctx context.Context, tr cStructs.TaskRequest, 
 		return
 	}
 
-	sCtx, cancel := context.WithTimeout(ctx, time.Second*2)
-	defer cancel()
-
-	block, err := client.GetBlock(sCtx, *hr)
+	block, err := client.GetBlock(ctx, *hr)
 	if err != nil {
 		ic.logger.Error("Error getting block", zap.Error(err))
 		stream.Send(cStructs.TaskResponse{
@@ -262,10 +259,7 @@ func (ic *IndexerClient) GetReward(ctx context.Context, tr cStructs.TaskRequest,
 		return
 	}
 
-	sCtx, cancel := context.WithTimeout(ctx, time.Second*2)
-	defer cancel()
-
-	reward, err := client.GetReward(sCtx, *ha)
+	reward, err := client.GetReward(ctx, *ha)
 	if err != nil {
 		ic.logger.Error("Error getting reward", zap.Error(err))
 		stream.Send(cStructs.TaskResponse{

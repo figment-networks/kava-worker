@@ -41,7 +41,14 @@ func (c Client) GetBlock(ctx context.Context, params structs.HeightHash) (block 
 		blockCacheEfficiencyMissed.Inc()
 	}
 
-	req, err := http.NewRequest(http.MethodGet, c.baseURL+"/block", nil)
+	err = c.rateLimiter.Wait(ctx)
+	if err != nil {
+		return block, err
+	}
+
+	sCtx, cancel := context.WithTimeout(ctx, time.Second*2)
+	defer cancel()
+	req, err := http.NewRequestWithContext(sCtx, http.MethodGet, c.baseURL+"/block", nil)
 	if err != nil {
 		return block, err
 	}
@@ -56,11 +63,6 @@ func (c Client) GetBlock(ctx context.Context, params structs.HeightHash) (block 
 		q.Add("height", strconv.FormatUint(params.Height, 10))
 	}
 	req.URL.RawQuery = q.Encode()
-
-	err = c.rateLimiter.Wait(ctx)
-	if err != nil {
-		return block, err
-	}
 
 	n := time.Now()
 	resp, err := c.httpClient.Do(req)
@@ -106,8 +108,18 @@ func (c Client) GetBlock(ctx context.Context, params structs.HeightHash) (block 
 // GetBlockAsync the async version of get block
 func (c Client) GetBlockAsync(ctx context.Context, in chan uint64, out chan<- BlockErrorPair) {
 	for height := range in {
-		req, err := http.NewRequest(http.MethodGet, c.baseURL+"/block", nil)
+		if err := c.rateLimiter.Wait(ctx); err != nil {
+			out <- BlockErrorPair{
+				Height: height,
+				Err:    err,
+			}
+			continue
+		}
+
+		sCtx, cancel := context.WithTimeout(ctx, time.Second*10)
+		req, err := http.NewRequestWithContext(sCtx, http.MethodGet, c.baseURL+"/block", nil)
 		if err != nil {
+			cancel()
 			out <- BlockErrorPair{
 				Height: height,
 				Err:    err,
@@ -124,8 +136,10 @@ func (c Client) GetBlockAsync(ctx context.Context, in chan uint64, out chan<- Bl
 		q.Add("height", strconv.FormatUint(height, 10))
 		req.URL.RawQuery = q.Encode()
 
-		err = c.rateLimiter.Wait(ctx)
+		n := time.Now()
+		resp, err := c.httpClient.Do(req)
 		if err != nil {
+			cancel()
 			out <- BlockErrorPair{
 				Height: height,
 				Err:    err,
@@ -133,15 +147,7 @@ func (c Client) GetBlockAsync(ctx context.Context, in chan uint64, out chan<- Bl
 			continue
 		}
 
-		n := time.Now()
-		resp, err := c.httpClient.Do(req)
-		if err != nil {
-			out <- BlockErrorPair{
-				Height: height,
-				Err:    err,
-			}
-			continue
-		}
+		cancel()
 		rawRequestDuration.WithLabels("/block", resp.Status).Observe(time.Since(n).Seconds())
 
 		decoder := json.NewDecoder(resp.Body)
@@ -186,7 +192,15 @@ func (c Client) GetBlockAsync(ctx context.Context, in chan uint64, out chan<- Bl
 
 // GetBlocksMeta fetches block metadata from given range of blocks
 func (c Client) GetBlocksMeta(ctx context.Context, params structs.HeightRange, blocks *BlocksMap, end chan<- error) {
-	req, err := http.NewRequest(http.MethodGet, c.baseURL+"/blockchain", nil)
+
+	if err := c.rateLimiter.Wait(ctx); err != nil {
+		end <- err
+		return
+	}
+
+	sCtx, cancel := context.WithTimeout(ctx, time.Second*12)
+	defer cancel()
+	req, err := http.NewRequestWithContext(sCtx, http.MethodGet, c.baseURL+"/blockchain", nil)
 	if err != nil {
 		end <- err
 		return
@@ -206,12 +220,6 @@ func (c Client) GetBlocksMeta(ctx context.Context, params structs.HeightRange, b
 		q.Add("maxHeight", strconv.FormatUint(params.EndHeight, 10))
 	}
 	req.URL.RawQuery = q.Encode()
-
-	err = c.rateLimiter.Wait(ctx)
-	if err != nil {
-		end <- err
-		return
-	}
 
 	n := time.Now()
 	resp, err := c.httpClient.Do(req)

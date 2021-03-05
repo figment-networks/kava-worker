@@ -37,7 +37,14 @@ type TxLogError struct {
 func (c *Client) SearchTx(ctx context.Context, r structs.HeightRange, blocks map[uint64]structs.Block, out chan cStruct.OutResp, page, perPage int, fin chan string) {
 	defer c.logger.Sync()
 
-	req, err := http.NewRequest(http.MethodGet, c.baseURL+"/tx_search", nil)
+	if err := c.rateLimiter.Wait(ctx); err != nil {
+		fin <- err.Error()
+		return
+	}
+
+	sCtx, cancel := context.WithTimeout(ctx, time.Second*10)
+	defer cancel()
+	req, err := http.NewRequestWithContext(sCtx, http.MethodGet, c.baseURL+"/tx_search", nil)
 	if err != nil {
 		fin <- err.Error()
 		return
@@ -68,15 +75,6 @@ func (c *Client) SearchTx(ctx context.Context, r structs.HeightRange, blocks map
 	q.Add("page", strconv.Itoa(page))
 	q.Add("per_page", strconv.Itoa(perPage))
 	req.URL.RawQuery = q.Encode()
-
-	// (lukanus): do not block initial calls
-	if r.EndHeight != 0 && r.StartHeight != 0 {
-		err = c.rateLimiter.Wait(ctx)
-		if err != nil {
-			fin <- err.Error()
-			return
-		}
-	}
 
 	now := time.Now()
 	resp, err := c.httpClient.Do(req)
