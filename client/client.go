@@ -195,10 +195,7 @@ func (ic *IndexerClient) GetReward(ctx context.Context, tr cStructs.TaskRequest,
 		return
 	}
 
-	sCtx, cancel := context.WithTimeout(ctx, time.Second*2)
-	defer cancel()
-
-	reward, err := client.GetReward(sCtx, *ha)
+	reward, err := client.GetReward(ctx, *ha)
 	if err != nil {
 		ic.logger.Error("Error getting reward", zap.Error(err))
 		stream.Send(cStructs.TaskResponse{
