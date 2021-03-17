@@ -138,7 +138,7 @@ func (c *Client) SearchTx(ctx context.Context, r structs.HeightRange, blocks map
 	return
 }
 
-// transform raw data from cosmos into transaction format with augmentation from blocks
+// transform raw data from chain into transaction format with augmentation from blocks
 func rawToTransaction(ctx context.Context, c *Client, in []types.TxResponse, blocks map[uint64]structs.Block, out chan cStruct.OutResp, logger *zap.Logger, cdc *codec.Codec) error {
 	defer logger.Sync()
 	for _, txRaw := range in {

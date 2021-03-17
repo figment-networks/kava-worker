@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 )
 
-// LogFormat format of logs from cosmos
+// LogFormat format of logs from cchain
 type LogFormat struct {
 	MsgIndex float64     `json:"msg_index"`
 	Success  bool        `json:"success"`
@@ -13,7 +13,7 @@ type LogFormat struct {
 	Events   []LogEvents `json:"events"`
 }
 
-// LogEvents format of events from logs cosmos
+// LogEvents format of events from logs chain
 type LogEvents struct {
 	Type       string                 `json:"type"`
 	Attributes []*LogEventsAttributes `json:"attributes"`

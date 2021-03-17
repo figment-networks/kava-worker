@@ -23,7 +23,7 @@ type ResponseDeliverTx struct {
 	Tags      []TxTag `json:"tags"`
 }
 
-// TxTag is tag from cosmos
+// TxTag is tag from chain
 type TxTag struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
