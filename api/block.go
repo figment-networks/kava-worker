@@ -35,10 +35,8 @@ func (c Client) GetBlock(ctx context.Context, params structs.HeightHash) (block 
 	if params.Height != 0 {
 		block, ok = c.Sbc.Get(params.Height)
 		if ok {
-			blockCacheEfficiencyHit.Inc()
 			return block, nil
 		}
-		blockCacheEfficiencyMissed.Inc()
 	}
 
 	req, err := http.NewRequest(http.MethodGet, c.baseURL+"/block", nil)
@@ -67,7 +65,7 @@ func (c Client) GetBlock(ctx context.Context, params structs.HeightHash) (block 
 	if err != nil {
 		return block, err
 	}
-	rawRequestDuration.WithLabels("/block", resp.Status).Observe(time.Since(n).Seconds())
+	rawRequestHTTPDuration.WithLabels("/block", resp.Status).Observe(time.Since(n).Seconds())
 	defer resp.Body.Close()
 
 	decoder := json.NewDecoder(resp.Body)
@@ -142,7 +140,7 @@ func (c Client) GetBlockAsync(ctx context.Context, in chan uint64, out chan<- Bl
 			}
 			continue
 		}
-		rawRequestDuration.WithLabels("/block", resp.Status).Observe(time.Since(n).Seconds())
+		rawRequestHTTPDuration.WithLabels("/block", resp.Status).Observe(time.Since(n).Seconds())
 
 		decoder := json.NewDecoder(resp.Body)
 
@@ -219,7 +217,7 @@ func (c Client) GetBlocksMeta(ctx context.Context, params structs.HeightRange, b
 		end <- err
 		return
 	}
-	rawRequestDuration.WithLabels("/blockchain", resp.Status).Observe(time.Since(n).Seconds())
+	rawRequestHTTPDuration.WithLabels("/blockchain", resp.Status).Observe(time.Since(n).Seconds())
 	defer resp.Body.Close()
 
 	decoder := json.NewDecoder(resp.Body)

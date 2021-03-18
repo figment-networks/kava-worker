@@ -129,7 +129,7 @@ func (ic *IndexerClient) Run(ctx context.Context, stream *cStructs.StreamAccess)
 	}
 }
 
-// GetTransactions gets new transactions and blocks from cosmos for given range
+// GetTransactions gets new transactions and blocks from chain for given range
 // it slice requests for batch up to the `bigPage` count
 func (ic *IndexerClient) GetTransactions(ctx context.Context, tr cStructs.TaskRequest, stream *cStructs.StreamAccess, client RPC) {
 	timer := metrics.NewTimer(getTransactionDuration)
