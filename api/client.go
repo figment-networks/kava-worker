@@ -50,5 +50,6 @@ func NewClient(url, key string, logger *zap.Logger, c *http.Client, reqPerSecLim
 // InitMetrics initialise metrics
 func InitMetrics() {
 	numberOfItemsTransactions = numberOfItems.WithLabels("transactions")
+	numberOfItemsInBlock = numberOfItemsBlock.WithLabels("transactions")
 	transactionConversionDuration = conversionDuration.WithLabels("transaction")
 }

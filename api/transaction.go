@@ -125,7 +125,7 @@ func (c *Client) SearchTx(ctx context.Context, r structs.HeightRange, blocks map
 		return
 	}
 
-	numberOfItemsTransactions.Observe(float64(totalCount))
+	numberOfItemsInBlock.Add(float64(totalCount))
 	c.logger.Debug("[COSMOS-API] Converting requests ", zap.Int("number", len(result.Result.Txs)), zap.Int("blocks", len(blocks)))
 	err = rawToTransaction(ctx, c, result.Result.Txs, blocks, out, c.logger, c.cdc)
 	if err != nil {
@@ -499,6 +499,7 @@ func rawToTransaction(ctx context.Context, c *Client, in []types.TxResponse, blo
 			}
 		}
 
+		numberOfItemsTransactions.Inc()
 		outTX.Payload = trans
 		out <- outTX
 		timer.ObserveDuration()
