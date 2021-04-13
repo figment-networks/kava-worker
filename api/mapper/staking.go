@@ -81,7 +81,7 @@ func StakingUndelegateToSub(msg sdk.Msg, logf types.LogFormat) (se shared.Subset
 					c, exp, coinErr = util.GetCoin(amount)
 				}
 				if coinErr != nil {
-					return se, fmt.Errorf("[COSMOS-API] Error parsing amount '%s': %s ", amount, coinErr)
+					return se, fmt.Errorf("[KAVA-API] Error parsing amount '%s': %s ", amount, coinErr)
 				}
 				attrAmt.Text = amount
 				attrAmt.Numeric.Set(c)

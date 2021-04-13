@@ -499,7 +499,7 @@ func (c *Client) GetFromRaw(logger *zap.Logger, txReader io.Reader) []map[string
 	base64Dec := base64.NewDecoder(base64.StdEncoding, txReader)
 	_, err := c.cdc.UnmarshalBinaryLengthPrefixedReader(base64Dec, tx, 0)
 	if err != nil {
-		logger.Error("[COSMOS-API] Problem decoding raw transaction (cdc) ", zap.Error(err))
+		logger.Error("[KAVA-API] Problem decoding raw transaction (cdc) ", zap.Error(err))
 	}
 	slice := []map[string]interface{}{}
 	for _, coin := range tx.Fee.Amount {

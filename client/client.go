@@ -85,7 +85,7 @@ func (ic *IndexerClient) CloseStream(ctx context.Context, streamID uuid.UUID) er
 	ic.sLock.Lock()
 	defer ic.sLock.Unlock()
 
-	ic.logger.Debug("[COSMOS-CLIENT] Close Stream", zap.Stringer("streamID", streamID))
+	ic.logger.Debug("[KAVA-CLIENT] Close Stream", zap.Stringer("streamID", streamID))
 	delete(ic.streams, streamID)
 
 	return nil
@@ -93,7 +93,7 @@ func (ic *IndexerClient) CloseStream(ctx context.Context, streamID uuid.UUID) er
 
 // RegisterStream adds new listeners to the streams - currently fixed number per stream
 func (ic *IndexerClient) RegisterStream(ctx context.Context, stream *cStructs.StreamAccess) error {
-	ic.logger.Debug("[COSMOS-CLIENT] Register Stream", zap.Stringer("streamID", stream.StreamID))
+	ic.logger.Debug("[KAVA-CLIENT] Register Stream", zap.Stringer("streamID", stream.StreamID))
 	newStreamsMetric.WithLabels().Inc()
 
 	ic.sLock.Lock()
@@ -239,7 +239,7 @@ SendLoop:
 
 			err := enc.Encode(t.Payload)
 			if err != nil {
-				logger.Error("[COSMOS-CLIENT] Error encoding payload data", zap.Error(err))
+				logger.Error("[KAVA-CLIENT] Error encoding payload data", zap.Error(err))
 			}
 
 			tr := cStructs.TaskResponse{
@@ -253,7 +253,7 @@ SendLoop:
 			order++
 			err = sender.Send(tr)
 			if err != nil {
-				logger.Error("[COSMOS-CLIENT] Error sending data", zap.Error(err))
+				logger.Error("[KAVA-CLIENT] Error sending data", zap.Error(err))
 			}
 			sendResponseMetric.WithLabels(t.Type, "yes").Inc()
 		}
@@ -267,7 +267,7 @@ SendLoop:
 	})
 
 	if err != nil {
-		logger.Error("[COSMOS-CLIENT] Error sending end", zap.Error(err))
+		logger.Error("[KAVA-CLIENT] Error sending end", zap.Error(err))
 	}
 
 	if fin != nil {
