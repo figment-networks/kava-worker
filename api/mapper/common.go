@@ -43,7 +43,7 @@ func produceTransfers(se *shared.SubsetEvent, transferType string, logf types.Lo
 					c, exp, coinErr = util.GetCoin(amount)
 				}
 				if coinErr != nil {
-					return fmt.Errorf("[COSMOS-API] Error parsing amount '%s': %s ", amount, coinErr)
+					return fmt.Errorf("[KAVA-API] Error parsing amount '%s': %s ", amount, coinErr)
 				}
 
 				attrAmt.Text = amount

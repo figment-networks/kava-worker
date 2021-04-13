@@ -73,7 +73,7 @@ func (ic *IndexerClient) CloseStream(ctx context.Context, streamID uuid.UUID) er
 	ic.sLock.Lock()
 	defer ic.sLock.Unlock()
 
-	ic.logger.Debug("[COSMOS-CLIENT] Close Stream", zap.Stringer("streamID", streamID))
+	ic.logger.Debug("[KAVA-CLIENT] Close Stream", zap.Stringer("streamID", streamID))
 	delete(ic.streams, streamID)
 
 	return nil
@@ -81,7 +81,7 @@ func (ic *IndexerClient) CloseStream(ctx context.Context, streamID uuid.UUID) er
 
 // RegisterStream adds new listeners to the streams - currently fixed number per stream
 func (ic *IndexerClient) RegisterStream(ctx context.Context, stream *cStructs.StreamAccess) error {
-	ic.logger.Debug("[COSMOS-CLIENT] Register Stream", zap.Stringer("streamID", stream.StreamID))
+	ic.logger.Debug("[KAVA-CLIENT] Register Stream", zap.Stringer("streamID", stream.StreamID))
 	newStreamsMetric.WithLabels().Inc()
 
 	ic.sLock.Lock()
@@ -138,7 +138,7 @@ func (ic *IndexerClient) GetTransactions(ctx context.Context, tr cStructs.TaskRe
 	hr := &structs.HeightRange{}
 	err := json.Unmarshal(tr.Payload, hr)
 	if err != nil {
-		ic.logger.Debug("[COSMOS-CLIENT] Cannot unmarshal payload", zap.String("contents", string(tr.Payload)))
+		ic.logger.Debug("[KAVA-CLIENT] Cannot unmarshal payload", zap.String("contents", string(tr.Payload)))
 		stream.Send(cStructs.TaskResponse{
 			Id:    tr.Id,
 			Error: cStructs.TaskError{Msg: "cannot unmarshal payload: " + err.Error()},
@@ -181,7 +181,7 @@ func (ic *IndexerClient) GetTransactions(ctx context.Context, tr cStructs.TaskRe
 				Error: cStructs.TaskError{Msg: err.Error()},
 				Final: true,
 			})
-			ic.logger.Error("[COSMOS-CLIENT] Error getting range (Get Transactions) ", zap.Error(err), zap.Stringer("taskID", tr.Id))
+			ic.logger.Error("[KAVA-CLIENT] Error getting range (Get Transactions) ", zap.Error(err), zap.Stringer("taskID", tr.Id))
 			return
 		}
 
@@ -191,7 +191,7 @@ func (ic *IndexerClient) GetTransactions(ctx context.Context, tr cStructs.TaskRe
 		}
 	}
 
-	ic.logger.Debug("[COSMOS-CLIENT] Received all", zap.Stringer("taskID", tr.Id))
+	ic.logger.Debug("[KAVA-CLIENT] Received all", zap.Stringer("taskID", tr.Id))
 	close(out)
 
 	for {
@@ -199,7 +199,7 @@ func (ic *IndexerClient) GetTransactions(ctx context.Context, tr cStructs.TaskRe
 		case <-sCtx.Done():
 			return
 		case <-fin:
-			ic.logger.Debug("[COSMOS-CLIENT] Finished sending all", zap.Stringer("taskID", tr.Id))
+			ic.logger.Debug("[KAVA-CLIENT] Finished sending all", zap.Stringer("taskID", tr.Id))
 			return
 		}
 	}
@@ -303,7 +303,7 @@ func (ic *IndexerClient) GetLatest(ctx context.Context, tr cStructs.TaskRequest,
 		return
 	}
 
-	ic.logger.Debug("[COSMOS-CLIENT] Get last block ", zap.Any("block", block), zap.Any("in", ldr))
+	ic.logger.Debug("[KAVA-CLIENT] Get last block ", zap.Any("block", block), zap.Any("in", ldr))
 	startingHeight := getStartingHeight(ldr.LastHeight, ic.maximumHeightsToGet, block.Height)
 	out := make(chan cStructs.OutResp, page)
 	fin := make(chan bool, 2)
@@ -327,7 +327,7 @@ func (ic *IndexerClient) GetLatest(ctx context.Context, tr cStructs.TaskRequest,
 				Error: cStructs.TaskError{Msg: err.Error()},
 				Final: true,
 			})
-			ic.logger.Error("[COSMOS-CLIENT] Error GettingRange from get latest ", zap.Error(err), zap.Stringer("taskID", tr.Id))
+			ic.logger.Error("[KAVA-CLIENT] Error GettingRange from get latest ", zap.Error(err), zap.Stringer("taskID", tr.Id))
 			break
 		}
 
@@ -336,7 +336,7 @@ func (ic *IndexerClient) GetLatest(ctx context.Context, tr cStructs.TaskRequest,
 		}
 	}
 
-	ic.logger.Debug("[COSMOS-CLIENT] Received all", zap.Stringer("taskID", tr.Id))
+	ic.logger.Debug("[KAVA-CLIENT] Received all", zap.Stringer("taskID", tr.Id))
 	close(out)
 
 	for {
@@ -344,7 +344,7 @@ func (ic *IndexerClient) GetLatest(ctx context.Context, tr cStructs.TaskRequest,
 		case <-sCtx.Done():
 			return
 		case <-fin:
-			ic.logger.Debug("[COSMOS-CLIENT] Finished sending all", zap.Stringer("taskID", tr.Id))
+			ic.logger.Debug("[KAVA-CLIENT] Finished sending all", zap.Stringer("taskID", tr.Id))
 			return
 		}
 	}
@@ -388,7 +388,7 @@ func getRange(ctx context.Context, logger *zap.Logger, client RPC, hr structs.He
 			bhr.EndHeight = hr.EndHeight
 		}
 
-		logger.Debug("[COSMOS-CLIENT] Getting blocks", zap.Uint64("end", bhr.EndHeight), zap.Uint64("start", bhr.StartHeight))
+		logger.Debug("[KAVA-CLIENT] Getting blocks", zap.Uint64("end", bhr.EndHeight), zap.Uint64("start", bhr.StartHeight))
 		go client.GetBlocksMeta(ctx, bhr, blocksAll, batchesCtrl)
 		i++
 
@@ -429,7 +429,7 @@ func getRange(ctx context.Context, logger *zap.Logger, client RPC, hr structs.He
 
 		toBeDone := int(math.Ceil(float64(blocksAll.NumTxs) / float64(page)))
 
-		logger.Debug("[COSMOS-CLIENT] Getting initial data ", zap.Uint64("all", blocksAll.NumTxs), zap.Int64("page", page), zap.Int("toBeDone", toBeDone))
+		logger.Debug("[KAVA-CLIENT] Getting initial data ", zap.Uint64("all", blocksAll.NumTxs), zap.Int64("page", page), zap.Int("toBeDone", toBeDone))
 		for i := 0; i < toBeDone; i++ {
 			go client.SearchTx(ctx, hr, blocksAll.Blocks, out, i+1, page, fin)
 		}
@@ -438,7 +438,7 @@ func getRange(ctx context.Context, logger *zap.Logger, client RPC, hr structs.He
 		for c := range fin {
 			responses++
 			if c != "" {
-				logger.Error("[COSMOS-CLIENT] Getting response from SearchTX", zap.String("error", c))
+				logger.Error("[KAVA-CLIENT] Getting response from SearchTX", zap.String("error", c))
 			}
 			if responses == toBeDone {
 				break
@@ -471,7 +471,7 @@ SendLoop:
 
 			err := enc.Encode(t.Payload)
 			if err != nil {
-				logger.Error("[COSMOS-CLIENT] Error encoding payload data", zap.Error(err))
+				logger.Error("[KAVA-CLIENT] Error encoding payload data", zap.Error(err))
 			}
 
 			tr := cStructs.TaskResponse{
@@ -485,7 +485,7 @@ SendLoop:
 			order++
 			err = stream.Send(tr)
 			if err != nil {
-				logger.Error("[COSMOS-CLIENT] Error sending data", zap.Error(err))
+				logger.Error("[KAVA-CLIENT] Error sending data", zap.Error(err))
 			}
 			sendResponseMetric.WithLabels(t.Type, "yes").Inc()
 		}
@@ -499,7 +499,7 @@ SendLoop:
 	})
 
 	if err != nil {
-		logger.Error("[COSMOS-CLIENT] Error sending end", zap.Error(err))
+		logger.Error("[KAVA-CLIENT] Error sending end", zap.Error(err))
 	}
 
 	if fin != nil {
