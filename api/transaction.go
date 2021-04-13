@@ -318,7 +318,7 @@ func rawToTransaction(ctx context.Context, c *Client, in []types.TxResponse, blo
 					ev, err = mapper.HardWithdrawToSub(msg, logAtIndex)
 				case "hard_borrow":
 					ev, err = mapper.HardBorrowToSub(msg, logAtIndex)
-				case "hard_liquidate":
+				case "liquidate": // (pacmessica): yes this doesn't have _hard
 					ev, err = mapper.HardLiquidateToSub(msg, logAtIndex)
 				case "hard_repay":
 					ev, err = mapper.HardRepayToSub(msg, logAtIndex)
@@ -327,8 +327,8 @@ func rawToTransaction(ctx context.Context, c *Client, in []types.TxResponse, blo
 				}
 			case "incentive":
 				switch msg.Type() {
-				case "claim_hard_liquidity_provider_reward":
-					ev, err = mapper.IncentiveClaimHardLiquidityProviderRewardToSub(msg, logAtIndex)
+				case "claim_hard_reward":
+					ev, err = mapper.IncentiveClaimHardRewardToSub(msg, logAtIndex)
 				case "claim_usdx_minting_reward":
 					ev, err = mapper.IncentiveClaimUSDXMintingRewardToSub(msg, logAtIndex)
 				default:

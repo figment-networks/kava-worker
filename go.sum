@@ -389,8 +389,8 @@ github.com/jtolds/gls v4.20.0+incompatible h1:xdiiI2gbIgH/gLH7ADydsJ1uDOEzR8yvV7
 github.com/jtolds/gls v4.20.0+incompatible/go.mod h1:QJZ7F/aHp+rZTRtaJ1ow/lLfFfVYBRgL+9YlvaHOwJU=
 github.com/julienschmidt/httprouter v1.2.0/go.mod h1:SYymIcj16QtmaHHD7aYtjjsJG7VTCxuUUipMqKk8s4w=
 github.com/kardianos/osext v0.0.0-20190222173326-2bc1f35cddc0/go.mod h1:1NbS8ALrpOvjt0rHPNLyCIeMtbizbir8U//inJ+zuB8=
-github.com/kava-labs/kava v0.13.1 h1:sc8/58mlxgmuiBXEpglHtYc+qTRYTyqadW75C63Srjs=
-github.com/kava-labs/kava v0.13.1/go.mod h1:eWBRWvt7ReAi16TsDK7n2ADz1wqeKWOehJXrEVUiRdg=
+github.com/kava-labs/kava v0.14.1 h1:lb7e5N6dgzL4Z8KIK+MYiX/7hydoPhHYbCFHz1Rfw4M=
+github.com/kava-labs/kava v0.14.1/go.mod h1:eWBRWvt7ReAi16TsDK7n2ADz1wqeKWOehJXrEVUiRdg=
 github.com/kelseyhightower/envconfig v1.4.0 h1:Im6hONhd3pLkfDFsbRgu68RDNkGF1r3dvMUtDTo2cv8=
 github.com/kelseyhightower/envconfig v1.4.0/go.mod h1:cccZRl6mQpaq41TPp5QxidR+Sa3axMbJDNb//FQX6Gg=
 github.com/keybase/go-keychain v0.0.0-20190712205309-48d3d31d256d h1:Z+RDyXzjKE0i2sTjZ/b1uxiGtPhFy34Ou/Tk0qwN0kM=

@@ -8,7 +8,7 @@ require (
 	github.com/figment-networks/indexer-manager v0.0.9
 	github.com/figment-networks/indexing-engine v0.1.14
 	github.com/google/uuid v1.1.4
-	github.com/kava-labs/kava v0.13.1
+	github.com/kava-labs/kava v0.14.1
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/rollbar/rollbar-go v1.2.0
 	github.com/sirupsen/logrus v1.7.0
