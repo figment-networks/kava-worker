@@ -66,7 +66,7 @@ List of currently supporter transaction types in kava-worker are (listed by modu
 - hard:
     `hard_deposit`, `hard_withdraw`,`hard_repay`,`hard_borrow`,`hard_liquidate`,
 - incentive:
-    `claim_hard_liquidity_provider_reward`,`claim_usdx_minting_reward`,
+    `claim_hard_reward`,`claim_usdx_minting_reward`,
 - issuance:
     `issue_tokens`, `redeem_tokens`, `block_address`, `unblock_address`, `change_pause_status`
 - pricefeed:
