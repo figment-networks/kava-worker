@@ -68,10 +68,10 @@ func IncentiveClaimUSDXMintingRewardToSub(msg sdk.Msg, logf types.LogFormat) (se
 	return se, err
 }
 
-func IncentiveClaimHardLiquidityProviderRewardToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
-	m, ok := msg.(incentive.MsgClaimHardLiquidityProviderReward)
+func IncentiveClaimHardRewardToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
+	m, ok := msg.(incentive.MsgClaimHardReward)
 	if !ok {
-		return se, errors.New("Not a claim_hard_liquidity_provider_reward type")
+		return se, errors.New("Not a claim_hard_reward type")
 	}
 
 	bech32Addr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, m.Sender.Bytes())
@@ -80,7 +80,7 @@ func IncentiveClaimHardLiquidityProviderRewardToSub(msg sdk.Msg, logf types.LogF
 	}
 
 	se = shared.SubsetEvent{
-		Type:   []string{"claim_hard_liquidity_provider_reward"},
+		Type:   []string{"claim_hard_reward"},
 		Module: "incentive",
 		Node: map[string][]shared.Account{
 			"sender": {{ID: bech32Addr}},

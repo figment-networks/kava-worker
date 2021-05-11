@@ -21,13 +21,20 @@ type rewardResponse struct {
 	Result rewardResult `json:"result"`
 }
 type rewardResult struct {
-	Total sdk.DecCoins `json:"total"`
+	Total            sdk.DecCoins      `json:"total"`
+	ValidatorRewards []validatorReward `json:"rewards"`
+}
+
+type validatorReward struct {
+	Validator string       `json:"validator_address"`
+	Rewards   sdk.DecCoins `json:"reward"`
 }
 
 const maxRetries = 3
 
 // GetReward fetches total rewards for delegator account
 func (c *Client) GetReward(ctx context.Context, params structs.HeightAccount) (resp structs.GetRewardResponse, err error) {
+	resp.Rewards = make(map[structs.Validator][]structs.TransactionAmount, 0)
 	resp.Height = params.Height
 	endpoint := fmt.Sprintf("/distribution/delegators/%v/rewards", params.Account)
 
@@ -86,16 +93,20 @@ func (c *Client) GetReward(ctx context.Context, params structs.HeightAccount) (r
 	if err = decoder.Decode(&result); err != nil {
 		return resp, err
 	}
+	for _, valReward := range result.Result.ValidatorRewards {
+		valRewards := make([]structs.TransactionAmount, 0, len(valReward.Rewards))
 
-	for _, reward := range result.Result.Total {
-		resp.Rewards = append(resp.Rewards,
-			structs.TransactionAmount{
-				Text:     reward.Amount.String(),
-				Numeric:  reward.Amount.BigInt(),
-				Currency: reward.Denom,
-				Exp:      sdk.Precision,
-			},
-		)
+		for _, reward := range valReward.Rewards {
+			valRewards = append(valRewards,
+				structs.TransactionAmount{
+					Text:     reward.Amount.String(),
+					Numeric:  reward.Amount.BigInt(),
+					Currency: reward.Denom,
+					Exp:      sdk.Precision,
+				},
+			)
+		}
+		resp.Rewards[structs.Validator(valReward.Validator)] = valRewards
 	}
 
 	return resp, err
