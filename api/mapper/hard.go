@@ -34,7 +34,7 @@ func HardDepositToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent,
 		Amount: hardProduceAmounts(m.Amount),
 	}
 
-	err = produceTransfers(&se, "send", logf)
+	err = produceTransfers(&se, "send", "", logf)
 	return se, err
 }
 
@@ -58,7 +58,7 @@ func HardWithdrawToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent
 		Amount: hardProduceAmounts(m.Amount),
 	}
 
-	err = produceTransfers(&se, "send", logf)
+	err = produceTransfers(&se, "send", "", logf)
 	return se, err
 }
 
@@ -82,7 +82,7 @@ func HardBorrowToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, 
 		Amount: hardProduceAmounts(m.Amount),
 	}
 
-	err = produceTransfers(&se, "send", logf)
+	err = produceTransfers(&se, "send", "", logf)
 	return se, err
 }
 
@@ -112,7 +112,7 @@ func HardRepayToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, e
 		Amount: hardProduceAmounts(m.Amount),
 	}
 
-	err = produceTransfers(&se, "send", logf)
+	err = produceTransfers(&se, "send", "", logf)
 	return se, err
 }
 
@@ -141,7 +141,7 @@ func HardLiquidateToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEven
 		},
 	}
 
-	err = produceTransfers(&se, "send", logf)
+	err = produceTransfers(&se, "send", "", logf)
 	return se, err
 }
 

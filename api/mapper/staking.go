@@ -3,11 +3,9 @@ package mapper
 import (
 	"errors"
 	"fmt"
-	"math/big"
 
 	shared "github.com/figment-networks/indexer-manager/structs"
 	"github.com/figment-networks/kava-worker/api/types"
-	"github.com/figment-networks/kava-worker/api/util"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	staking "github.com/cosmos/cosmos-sdk/x/staking"
@@ -49,60 +47,7 @@ func StakingUndelegateToSub(msg sdk.Msg, logf types.LogFormat) (se shared.Subset
 		},
 	}
 
-	var withdrawAddr string
-	rewards := []shared.TransactionAmount{}
-	for _, ev := range logf.Events {
-		if ev.Type != "transfer" {
-			continue
-		}
-
-		var latestRecipient string
-		for _, attr := range ev.Attributes {
-			if len(attr.Recipient) > 0 {
-				latestRecipient = attr.Recipient[0]
-			}
-			if latestRecipient == unbondedTokensPoolAddr {
-				continue
-			}
-			withdrawAddr = latestRecipient
-
-			for _, amount := range attr.Amount {
-				attrAmt := shared.TransactionAmount{Numeric: &big.Int{}}
-				sliced := util.GetCurrency(amount)
-				var (
-					c       *big.Int
-					exp     int32
-					coinErr error
-				)
-				if len(sliced) == 3 {
-					attrAmt.Currency = sliced[2]
-					c, exp, coinErr = util.GetCoin(sliced[1])
-				} else {
-					c, exp, coinErr = util.GetCoin(amount)
-				}
-				if coinErr != nil {
-					return se, fmt.Errorf("[KAVA-API] Error parsing amount '%s': %s ", amount, coinErr)
-				}
-				attrAmt.Text = amount
-				attrAmt.Numeric.Set(c)
-				attrAmt.Exp = exp
-				if attrAmt.Numeric.Cmp(&zero) != 0 {
-					rewards = append(rewards, attrAmt)
-				}
-			}
-		}
-	}
-
-	if len(rewards) == 0 {
-		return se, nil
-	}
-	se.Transfers = map[string][]shared.EventTransfer{
-		"reward": []shared.EventTransfer{{
-			Amounts: rewards,
-			Account: shared.Account{ID: withdrawAddr},
-		}},
-	}
-
+	produceTransfers(&se, "reward", unbondedTokensPoolAddr, logf)
 	return se, nil
 }
 
@@ -138,7 +83,7 @@ func StakingDelegateToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEv
 		},
 	}
 
-	err = produceTransfers(&se, "reward", logf)
+	err = produceTransfers(&se, "reward", "", logf)
 	return se, err
 }
 
@@ -180,7 +125,7 @@ func StakingBeginRedelegateToSub(msg sdk.Msg, logf types.LogFormat) (se shared.S
 		},
 	}
 
-	err = produceTransfers(&se, "reward", logf)
+	err = produceTransfers(&se, "reward", "", logf)
 	return se, err
 }
 

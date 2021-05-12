@@ -37,7 +37,7 @@ func IncentiveClaimRewardToSub(msg sdk.Msg, logf types.LogFormat) (se shared.Sub
 		},
 	}
 
-	err = produceTransfers(&se, "reward", logf)
+	err = produceTransfers(&se, "reward", "", logf)
 	return se, err
 }
 */
@@ -64,7 +64,7 @@ func IncentiveClaimUSDXMintingRewardToSub(msg sdk.Msg, logf types.LogFormat) (se
 		},
 	}
 
-	err = produceTransfers(&se, "reward", logf)
+	err = produceTransfers(&se, "reward", "", logf)
 	return se, err
 }
 
@@ -90,6 +90,6 @@ func IncentiveClaimHardRewardToSub(msg sdk.Msg, logf types.LogFormat) (se shared
 		},
 	}
 
-	err = produceTransfers(&se, "reward", logf)
+	err = produceTransfers(&se, "reward", "", logf)
 	return se, err
 }
