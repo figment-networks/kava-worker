@@ -40,7 +40,7 @@ func BankMultisendToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEven
 		se.Recipient = append(se.Recipient, evt)
 	}
 
-	err = produceTransfers(&se, "send", logf)
+	err = produceTransfers(&se, "send", "", logf)
 	return se, err
 }
 
@@ -61,7 +61,7 @@ func BankSendToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, er
 	evt, _ = bankProduceEvTx(send.ToAddress, send.Amount)
 	se.Recipient = append(se.Recipient, evt)
 
-	err = produceTransfers(&se, "send", logf)
+	err = produceTransfers(&se, "send", "", logf)
 	return se, err
 }
 
