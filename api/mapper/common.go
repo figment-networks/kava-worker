@@ -3,7 +3,9 @@ package mapper
 import (
 	"fmt"
 	"math/big"
+	"strings"
 
+	"github.com/figment-networks/indexer-manager/structs"
 	shared "github.com/figment-networks/indexer-manager/structs"
 	"github.com/figment-networks/kava-worker/api/types"
 	"github.com/figment-networks/kava-worker/api/util"
@@ -14,9 +16,9 @@ import (
 
 var bech32ValPrefix string = app.Bech32MainPrefix + sdk.PrefixValidator + sdk.PrefixOperator
 
-func produceTransfers(se *shared.SubsetEvent, transferType string, logf types.LogFormat) (err error) {
-	var evts []shared.EventTransfer
-	m := make(map[string][]shared.TransactionAmount)
+func produceTransfers(se *structs.SubsetEvent, transferType, skipAddr string, logf types.LogFormat) (err error) {
+	var evts []structs.EventTransfer
+
 	for _, ev := range logf.Events {
 		if ev.Type != "transfer" {
 			continue
@@ -28,7 +30,17 @@ func produceTransfers(se *shared.SubsetEvent, transferType string, logf types.Lo
 				latestRecipient = attr.Recipient[0]
 			}
 
-			for _, amount := range attr.Amount {
+			if latestRecipient == skipAddr {
+				continue
+			}
+
+			amts := []structs.TransactionAmount{}
+
+			if len(attr.Amount) == 0 {
+				continue
+			}
+
+			for _, amount := range strings.Split(attr.Amount[0], ",") {
 				attrAmt := shared.TransactionAmount{Numeric: &big.Int{}}
 				sliced := util.GetCurrency(amount)
 				var (
@@ -50,19 +62,13 @@ func produceTransfers(se *shared.SubsetEvent, transferType string, logf types.Lo
 				attrAmt.Exp = exp
 				attrAmt.Numeric.Set(c)
 
-				m[latestRecipient] = append(m[latestRecipient], attrAmt)
-
+				amts = append(amts, attrAmt)
 			}
+			evts = append(evts, structs.EventTransfer{
+				Amounts: amts,
+				Account: structs.Account{ID: latestRecipient},
+			})
 		}
-	}
-
-	for addr, amts := range m {
-		// todo should we include sender/recipient in EventTransfer?
-		// sender is available in kava logs
-		evts = append(evts, shared.EventTransfer{
-			Amounts: amts,
-			Account: shared.Account{ID: addr},
-		})
 	}
 
 	if len(evts) <= 0 {
@@ -70,7 +76,7 @@ func produceTransfers(se *shared.SubsetEvent, transferType string, logf types.Lo
 	}
 
 	if se.Transfers[transferType] == nil {
-		se.Transfers = make(map[string][]shared.EventTransfer)
+		se.Transfers = make(map[string][]structs.EventTransfer)
 	}
 	se.Transfers[transferType] = evts
 

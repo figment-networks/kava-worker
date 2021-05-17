@@ -63,7 +63,7 @@ func Bep3CreateAtomicSwapToSub(msg sdk.Msg, logf types.LogFormat) (se shared.Sub
 	}
 
 	se.Amount = txAmount
-	err = produceTransfers(&se, "send", logf)
+	err = produceTransfers(&se, "send", "", logf)
 	return se, nil
 }
 
@@ -113,6 +113,6 @@ func Bep3RefundAtomicSwapToSub(msg sdk.Msg, logf types.LogFormat) (se shared.Sub
 		},
 	}
 
-	err = produceTransfers(&se, "send", logf)
+	err = produceTransfers(&se, "send", "", logf)
 	return se, err
 }

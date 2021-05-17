@@ -41,7 +41,7 @@ func HarvestDepositToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEve
 		},
 	}
 
-	err = produceTransfers(&se, "send", logf)
+	err = produceTransfers(&se, "send", "", logf)
 	return se, err
 }
 
@@ -74,7 +74,7 @@ func HarvestWithdrawToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEv
 		},
 	}
 
-	err = produceTransfers(&se, "send", logf)
+	err = produceTransfers(&se, "send", "", logf)
 	return se, err
 }
 
@@ -108,7 +108,7 @@ func HarvestClaimRewardToSub(msg sdk.Msg, logf types.LogFormat) (se shared.Subse
 		},
 	}
 
-	err = produceTransfers(&se, "reward", logf)
+	err = produceTransfers(&se, "reward", "", logf)
 	return se, err
 }
 */
