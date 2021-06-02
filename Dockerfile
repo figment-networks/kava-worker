@@ -3,7 +3,7 @@
 # ------------------------------------------------------------------------------
 FROM golang:1.14 AS build
 
-WORKDIR /go/src/github.com/figment-networks/worker-cosmos/
+WORKDIR /go/src/github.com/figment-networks/worker-kava/
 
 COPY ./go.mod .
 COPY ./go.sum .
