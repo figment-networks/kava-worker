@@ -19,15 +19,15 @@ deployments:
         kava-worker:
           env:
             APP_ENV: production
-            TENDERMINT_RPC_ADDR: https://kava-3--rpc--archive.datahub.figment.io
-            TENDERMINT_LCD_ADDR: https://kava-3--rpc--archive.datahub.figment.io:
+            TENDERMINT_RPC_ADDR: "https://kava-3--rpc--archive.datahub.figment.io"
+            TENDERMINT_LCD_ADDR: "https://kava-3--rpc--archive.datahub.figment.io:"
             DATAHUB_KEY:
               secretsManagerKeyRef:
                 key: prod/indexers/common
                 property: datahub_key
             CHAIN_ID: kava-3
-            MANAGERS: ???
-            MANAGER_INTERVAL: ??
+            MANAGERS: ""
+            MANAGER_INTERVAL: ""
             MAXIMUM_HEIGHTS_TO_GET: 10000
             REQUESTS_PER_SECOND: 33
             HEALTH_CHECK_INTERVAL: 10s
