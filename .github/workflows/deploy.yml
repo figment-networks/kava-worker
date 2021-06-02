@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches: [ k8s-helm ]
 
 env:
   EKS_NAMESPACE: indexers
