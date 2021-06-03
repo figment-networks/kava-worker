@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"sync"
@@ -101,6 +100,7 @@ func (c Client) GetBlock(ctx context.Context, params structs.HeightHash) (block 
 	return block, nil
 }
 
+/*
 // GetBlockAsync the async version of get block
 func (c Client) GetBlockAsync(ctx context.Context, in chan uint64, out chan<- BlockErrorPair) {
 	for height := range in {
@@ -255,3 +255,4 @@ func (c Client) GetBlocksMeta(ctx context.Context, params structs.HeightRange, b
 	end <- nil
 	return
 }
+*/
