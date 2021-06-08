@@ -6,7 +6,7 @@ global:
     severity: noncritical
 
 deployments:
-  kava-7-worker:
+  kava-worker:
     service:
       ports:
         http:
