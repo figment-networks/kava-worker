@@ -21,12 +21,12 @@ deployments:
             APP_ENV: production
             TENDERMINT_RPC_ADDR: "http://54.39.106.156:26657"
             TENDERMINT_LCD_ADDR: "http://54.39.106.156:1317"
-            CHAIN_ID: kava-7
+            CHAIN_ID: "kava-7"
             MANAGERS: "indexer-manager.indexers.svc.cluster.local:8085"
             MANAGER_INTERVAL: "10s"
             MAXIMUM_HEIGHTS_TO_GET: 10000
             REQUESTS_PER_SECOND: 33
-            HEALTH_CHECK_INTERVAL: 10s
+            HEALTH_CHECK_INTERVAL: "10s"
             ROLLBAR_ACCESS_TOKEN:
               secretsManagerKeyRef:
                 key: prod/indexers/common
