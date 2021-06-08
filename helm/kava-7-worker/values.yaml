@@ -6,7 +6,7 @@ global:
     severity: noncritical
 
 deployments:
-  kava-worker:
+  kava-7-worker:
     service:
       ports:
         http:
@@ -16,7 +16,7 @@ deployments:
     replicas: 1
     pod:
       containers:
-        kava-worker7:
+        kava-7-worker:
           env:
             APP_ENV: production
             TENDERMINT_RPC_ADDR: "http://54.39.106.156:26657"

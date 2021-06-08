@@ -24,7 +24,7 @@ build: LDFLAGS += -X $(MODULE)/cmd/worker-kava/config.Timestamp=$(shell date +%s
 build: LDFLAGS += -X $(MODULE)/cmd/worker-kava/config.Version=$(VERSION)
 build: LDFLAGS += -X $(MODULE)/cmd/worker-kava/config.GitSHA=$(GIT_SHA)
 build:
-	go build -o worker -ldflags '$(LDFLAGS)'  ./cmd/worker-kava
+      CGO_ENABLED=0 go build -o worker -ldflags '$(LDFLAGS)' ./cmd/worker-kava
 
 .PHONY: pack-release
 pack-release:
