@@ -2,7 +2,8 @@ name: Deploy
 
 on:
   push:
-    branches: [ k8s-helm-kava-7 ]
+    tags:
+      - '*'
 
 env:
   EKS_NAMESPACE: indexers
