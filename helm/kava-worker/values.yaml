@@ -20,7 +20,7 @@ deployments:
           env:
             APP_ENV: production
             TENDERMINT_RPC_ADDR: "http://54.39.106.156:26657"
-            TENDERMINT_LCD_ADDR: "http://54.39.106.156:26657"
+            TENDERMINT_LCD_ADDR: "http://54.39.106.156:1317"
             CHAIN_ID: kava-7
             MANAGERS: "indexer-manager.indexers.svc.cluster.local:8085"
             MANAGER_INTERVAL: "10s"
