@@ -1,0 +1,6 @@
+dependencies:
+- name: common
+  repository: https://raw.githubusercontent.com/figment-networks/helm/github-actions/_registry
+  version: 0.0.1
+digest: sha256:5f91c7ba5993e913efd9210a97ea3c3d464e304ab436700cddb4357a96befcd9
+generated: "2021-05-05T13:54:54.569610472-06:00"
