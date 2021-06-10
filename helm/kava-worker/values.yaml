@@ -45,11 +45,11 @@ deployments:
           livenessProbe:
             httpGet:
               path: /liveness
-              port: 8085
+              port: 8087
           readinessProbe:
             httpGet:
               path: /readiness
-              port: 8085
+              port: 8087
           resources:
             requests:
               memory: 200Mi
