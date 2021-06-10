@@ -1,36 +1,33 @@
-name: Deploy
+name: Deploy kava-7
 
 on:
   push:
     tags:
-      - '*'
+      - 'v*'
 
 env:
   EKS_NAMESPACE: indexers
   EKS_CLUSTER_NAME: prod
   HELM_DRIVER: configmap
-  TESTVAR: ${{github.event.repository.name}}
-  REGISTRY: 703336180274.dkr.ecr.ca-central-1.amazonaws.com
+  IMAGE_REGISTRY: ${{ secrets.AWS_DOCKER_REGISTRY }}
+  IMAGE_REPOSITORY: ${{github.event.repository.name}}
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: "Test"
-        run: env
-
-      - name: "Get repo name"
-        run: echo "${{ github.event.repository.name }}"
-
       - name: Checkout
         uses: actions/checkout@v2
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
-      - name: Bump version and push tag
-        id: tag-version
-        uses: figment-networks/gh-tag-action@0.1.0
+      - name: Set ref vars
+        id: refs
+        run: |
+          echo ::set-output name=SOURCE_NAME::${GITHUB_REF#refs/*/}
+          echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
+          echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -46,10 +43,8 @@ jobs:
       - name: Create ECR docker repository if needed
         run: |
           set -euo pipefail
-
           # Only take everything after the slash octocat/hello-world
           REPOSITORY=${GITHUB_REPOSITORY#*/}
-
           if ! aws ecr describe-repositories --repository-name="$REPOSITORY" > /dev/null 2>&1
           then
             echo "Creating $REPOSITORY"
@@ -57,7 +52,6 @@ jobs:
           else
             echo "$REPOSITORY already exists"
           fi
-
       - name: Docker login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
@@ -69,11 +63,10 @@ jobs:
           context: .
           push: true
           tags: |
-            703336180274.dkr.ecr.ca-central-1.amazonaws.com/${{github.event.repository.name}}:${{github.sha}}
-            703336180274.dkr.ecr.ca-central-1.amazonaws.com/${{github.event.repository.name}}:${{ steps.tag-version.outputs.new-version }}
-            703336180274.dkr.ecr.ca-central-1.amazonaws.com/${{github.event.repository.name}}:production
-            703336180274.dkr.ecr.ca-central-1.amazonaws.com/${{github.event.repository.name}}:latest
-
+            ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_REPOSITORY }}:${{github.sha}}
+            ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_REPOSITORY }}:${{ steps.refs.outputs.SOURCE_TAG }}
+            ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_REPOSITORY }}:production
+            ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_REPOSITORY }}:latest
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
 
@@ -81,77 +74,66 @@ jobs:
         run: aws eks update-kubeconfig --name $EKS_CLUSTER_NAME
 
       - name: Helm repository login
+        env:
+          HELM_REPOSITORY_USERNAME: ${{ secrets.HELM_REPOSITORY_USERNAME }} \
+          HELM_REPOSITORY_PASSWORD: ${{ secrets.HELM_REPOSITORY_PASSWORD }}
         run: |
           helm repo add figment-helm-repo https://raw.githubusercontent.com/figment-networks/helm/main/_repo \
-          --username=${{ secrets.HELM_REPOSITORY_USERNAME }} \
-          --password=${{ secrets.HELM_REPOSITORY_PASSWORD }}
-
+          --username="$HELM_REPOSITORY_USERNAME" \
+          --password="$HELM_REPOSITORY_PASSWORD"
       - name: Install helm diff
         run: helm plugin install https://github.com/databus23/helm-diff
 
       - name: Helm diff
+        env:
+          IMAGE: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_REPOSITORY }}:${{ steps.refs.outputs.SOURCE_TAG }}
         run: |
           set -euo pipefail
-
-          IMAGE="703336180274.dkr.ecr.ca-central-1.amazonaws.com/${{github.event.repository.name}}:${{ steps.tag-version.outputs.new-version }}"
-
+          #IMAGE="${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_REPOSITORY }}:${{ steps.refs.outputs.SOURCE_TAG }}"
           for dir in ./helm/*
           do
             echo "Diffing [$dir] in namespace [$EKS_NAMESPACE]"
-
             helm dep up "$dir"
-
             helm diff --context=3 upgrade --allow-unreleased --namespace "$EKS_NAMESPACE" "$(basename "$dir")" "$dir" \
             --set global.image="$IMAGE"
-
           done
-
       - name: Deploy
         id: deploy
+        env:
+          IMAGE: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_REPOSITORY }}:${{ steps.refs.outputs.SOURCE_TAG }}
         run: |
           set -euo pipefail
-
-          IMAGE="703336180274.dkr.ecr.ca-central-1.amazonaws.com/${{github.event.repository.name}}:${{ steps.tag-version.outputs.new-version }}"
-
+          #IMAGE="${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_REPOSITORY }}:${{ steps.refs.outputs.SOURCE_TAG }}"
           for dir in ./helm/*
           do
             echo "Deploying [$dir] to namespace [$EKS_NAMESPACE]"
-
             #helm dep up "$dir"
-
             helm upgrade --install --namespace "$EKS_NAMESPACE" "$(basename "$dir")" "$dir" \
             --set global.image="$IMAGE"
-
           done
-
       - name: Rollout status
         id: rollout_status
         if: steps.deploy.outcome == 'success'
         run: |
           set -euo pipefail
-
+          pwd
+          echo ./helm/*
           for dir in ./helm/*
           do
             echo "Checking statuses of [$dir]"
-
-            for resource in $(kubectl get deployment,statefulset -l chart="$(basename "$dir")" --output=name)
+            for resource in $(kubectl get deployment,statefulset --namespace="$EKS_NAMESPACE" -l chart="$(basename "$dir")" --output=name)
             do
               echo "Status [$resource]"
-
-              kubectl rollout status --timeout=60s "$resource"
+              kubectl rollout status --namespace="$EKS_NAMESPACE" --timeout=60s "$resource"
             done
-
           done
-
       - name: Kubernetes deployment failure debug information
         if: ${{ failure() && ((steps.deploy.outcome == 'failure') || (steps.rollout_status.outcome == 'failure')) }}
         run: |
           set -euo pipefail
-
           for dir in ./helm/*
           do
-            kubectl describe pods -l chart="$(basename "$dir")"
-            kubectl logs --tail 20 -l chart="$(basename "$dir")"
+            kubectl describe pods --namespace="$EKS_NAMESPACE" -l chart="$(basename "$dir")"
+            kubectl logs --tail 20 --namespace="$EKS_NAMESPACE" -l chart="$(basename "$dir")"
           done
-
           exit 1

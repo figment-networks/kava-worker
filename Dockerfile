@@ -1,7 +1,7 @@
 # ------------------------------------------------------------------------------
 # Builder Image
 # ------------------------------------------------------------------------------
-FROM golang:1.14 AS build
+FROM golang AS build
 
 WORKDIR /go/src/github.com/figment-networks/worker-kava/
 
@@ -29,7 +29,7 @@ RUN \
 # ------------------------------------------------------------------------------
 # Target Image
 # ------------------------------------------------------------------------------
-FROM alpine:3.10 AS release
+FROM alpine AS release
 RUN adduser --system --uid 1234 figment
 WORKDIR /app/kava
 COPY --from=build /go/src/github.com/figment-networks/worker-kava/worker /app/kava/worker
