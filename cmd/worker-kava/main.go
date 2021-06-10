@@ -16,6 +16,7 @@ import (
 	"github.com/figment-networks/indexer-manager/worker/connectivity"
 	grpcIndexer "github.com/figment-networks/indexer-manager/worker/transport/grpc"
 	grpcProtoIndexer "github.com/figment-networks/indexer-manager/worker/transport/grpc/indexer"
+	"github.com/figment-networks/indexing-engine/health"
 	"github.com/figment-networks/indexing-engine/metrics"
 	"github.com/figment-networks/indexing-engine/metrics/prometheusmetrics"
 	"github.com/figment-networks/kava-worker/api"
@@ -116,6 +117,10 @@ func main() {
 	mux := http.NewServeMux()
 	attachProfiling(mux)
 	attachDynamic(ctx, mux)
+
+	monitor := &health.Monitor{}
+	go monitor.RunChecks(ctx, cfg.HealthCheckInterval)
+	monitor.AttachHttp(mux)
 
 	mux.Handle("/metrics", metrics.Handler())
 
