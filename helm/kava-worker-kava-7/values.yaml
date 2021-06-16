@@ -6,7 +6,7 @@ global:
     severity: noncritical
 
 deployments:
-  kava-worker:
+  kava-worker-kava-7:
     service:
       ports:
         http:
@@ -20,7 +20,7 @@ deployments:
     replicas: 1
     pod:
       containers:
-        kava-7-worker:
+        kava-worker-kava-7:
           env:
             APP_ENV: production
             TENDERMINT_RPC_ADDR: http://54.39.106.156:26657
@@ -30,6 +30,7 @@ deployments:
                 fieldPath: status.podIP
             CHAIN_ID: kava-7
             MANAGERS: indexer-manager.indexers.svc.cluster.local:8085
+            STORE_HTTP_ENDPOINTS: http://indexer-search.indexers.svc.cluster.local:8986/input/jsonrpc
             MANAGER_INTERVAL: 10s
             MAXIMUM_HEIGHTS_TO_GET: 10000
             REQUESTS_PER_SECOND: 33
@@ -41,7 +42,6 @@ deployments:
                 key: prod/indexers/common
                 property: rollbar_token
             ROLLBAR_SERVER_ROOT: github.com/figment-networks/kava-worker
-            BIG_PAGE: 1000
           livenessProbe:
             httpGet:
               path: /liveness

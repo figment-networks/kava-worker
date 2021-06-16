@@ -16,6 +16,9 @@ import (
 	"github.com/figment-networks/indexer-manager/worker/connectivity"
 	grpcIndexer "github.com/figment-networks/indexer-manager/worker/transport/grpc"
 	grpcProtoIndexer "github.com/figment-networks/indexer-manager/worker/transport/grpc/indexer"
+
+	httpStore "github.com/figment-networks/indexer-manager/worker/store/transport/http"
+
 	"github.com/figment-networks/indexing-engine/health"
 	"github.com/figment-networks/indexing-engine/metrics"
 	"github.com/figment-networks/indexing-engine/metrics/prometheusmetrics"
@@ -109,7 +112,10 @@ func main() {
 	rpcClient := api.NewClient(cfg.TendermintRPCAddr, cfg.DatahubKey, logger.GetLogger(), nil, int(cfg.RequestsPerSecond))
 	lcdClient := api.NewClient(cfg.TendermintLCDAddr, cfg.DatahubKey, logger.GetLogger(), nil, int(cfg.RequestsPerSecond))
 
-	workerClient := client.NewIndexerClient(ctx, logger.GetLogger(), rpcClient, lcdClient, uint64(cfg.BigPage), uint64(cfg.MaximumHeightsToGet))
+	storeEndpoints := strings.Split(cfg.StoreHTTPEndpoints, ",")
+	hStore := httpStore.NewHTTPJSONRPCHeightStore(storeEndpoints, &http.Client{})
+
+	workerClient := client.NewIndexerClient(ctx, logger.GetLogger(), rpcClient, lcdClient, hStore, uint64(cfg.MaximumHeightsToGet))
 
 	worker := grpcIndexer.NewIndexerServer(ctx, workerClient, logger.GetLogger())
 	grpcProtoIndexer.RegisterIndexerServiceServer(grpcServer, worker)
