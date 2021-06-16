@@ -1,5 +1,5 @@
 apiVersion: v2
-name: kava-worker
+name: kava-worker-kava-7
 description: An indexer worker part dedicated for kava transactions
 type: application
 version: 0.1.0

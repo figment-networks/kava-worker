@@ -155,6 +155,15 @@ func rawToTransaction(ctx context.Context, in types.TxResponse, logger *zap.Logg
 		if errin := json.Unmarshal([]byte(logf.Log), &tle); errin == nil && tle.Message != "" {
 			txErrs = append(txErrs, tle)
 		}
+		s.WriteString(`"`)
+
+		q.Add("query", s.String())
+		q.Add("page", strconv.Itoa(page))
+		q.Add("per_page", strconv.Itoa(perPage))
+		req.URL.RawQuery = q.Encode()
+
+		now := time.Now()
+		resp, err := c.httpClient.Do(req)
 
 	}
 
