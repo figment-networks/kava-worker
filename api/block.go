@@ -43,7 +43,7 @@ func (c Client) GetBlock(ctx context.Context, params structs.HeightHash) (block 
 		return block, err
 	}
 
-	sCtx, cancel := context.WithTimeout(ctx, time.Second*2)
+	sCtx, cancel := context.WithTimeout(ctx, time.Second*50)
 	defer cancel()
 	req, err := http.NewRequestWithContext(sCtx, http.MethodGet, c.baseURL+"/block", nil)
 	if err != nil {

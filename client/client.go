@@ -62,7 +62,7 @@ func NewIndexerClient(ctx context.Context, logger *zap.Logger, rpcCli RPC, lcdCl
 	getBlockDuration = endpointDuration.WithLabels("getBlock")
 	api.InitMetrics()
 
-	return &IndexerClient{
+	ic := &IndexerClient{
 		logger:              logger,
 		rpcCli:              rpcCli,
 		lcdCli:              lcdCli,
@@ -70,6 +70,9 @@ func NewIndexerClient(ctx context.Context, logger *zap.Logger, rpcCli RPC, lcdCl
 		maximumHeightsToGet: maximumHeightsToGet,
 		streams:             make(map[uuid.UUID]*cStructs.StreamAccess),
 	}
+
+	ic.Reqester = ranged.NewRangeRequester(ic, 20)
+	return ic
 }
 
 // CloseStream removes stream from worker/client
