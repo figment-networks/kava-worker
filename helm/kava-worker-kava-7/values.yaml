@@ -1,6 +1,15 @@
 global:
   annotations:
     figment.io/github_repository: "github.com/figment-networks/kava-worker"
+    ad.datadoghq.com/kava-worker.check_names: '["openmetrics"]'
+    ad.datadoghq.com/kava-worker.init_configs: '[{}]'
+    ad.datadoghq.com/kava-worker.instances: '[{
+        "prometheus_url": "http://%%host%%:8087/metrics",
+        "namespace": "workers",
+        "metrics": ["*"],
+        "send_distribution_buckets": true,
+        "tags": ["network:kava","chain_id:kava-7","group:indexer-workers","cluster:k8s"]
+      }]'
   labels:
     team: indexers
     severity: noncritical
@@ -37,11 +46,6 @@ deployments:
             HEALTH_CHECK_INTERVAL: 10s
             PORT: 3000
             HTTP_PORT: 8087
-            ROLLBAR_ACCESS_TOKEN:
-              secretsManagerKeyRef:
-                key: prod/indexers/common
-                property: rollbar_token
-            ROLLBAR_SERVER_ROOT: github.com/figment-networks/kava-worker
           livenessProbe:
             httpGet:
               path: /liveness
