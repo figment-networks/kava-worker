@@ -54,7 +54,7 @@ func GovDepositToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, 
 	se.Sender = []shared.EventTransfer{sender}
 	se.Amount = txAmount
 
-	err = produceTransfers(&se, "send", logf)
+	err = produceTransfers(&se, "send", "", logf)
 	return se, err
 }
 
@@ -136,6 +136,6 @@ func GovSubmitProposalToSub(msg sdk.Msg, logf types.LogFormat) (se shared.Subset
 		se.Additional["content"] = []string{sp.Content.String()}
 	}
 
-	err = produceTransfers(&se, "send", logf)
+	err = produceTransfers(&se, "send", "", logf)
 	return se, err
 }

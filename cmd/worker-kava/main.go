@@ -129,6 +129,10 @@ func main() {
 
 	attachDynamic(ctx, mux)
 
+	monitor := &health.Monitor{}
+	go monitor.RunChecks(ctx, cfg.HealthCheckInterval)
+	monitor.AttachHttp(mux)
+
 	mux.Handle("/metrics", metrics.Handler())
 
 	s := &http.Server{

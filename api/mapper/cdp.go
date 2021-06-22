@@ -178,3 +178,32 @@ func CDPRepayCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 		},
 	}, nil
 }
+
+func CDPLiquidateToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+	m, ok := msg.(cdp.MsgLiquidate)
+	if !ok {
+		return se, errors.New("Not a liquidate type")
+	}
+
+	bech32KeeperAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, m.Keeper.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting KeeperAddress: %w", err)
+	}
+
+	bech32BorrowerAddr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, m.Borrower.Bytes())
+	if err != nil {
+		return se, fmt.Errorf("error converting BorrowerAddress: %w", err)
+	}
+
+	return shared.SubsetEvent{
+		Type:   []string{"liquidate"},
+		Module: "cdp",
+		Node: map[string][]shared.Account{
+			"keeper":   {{ID: bech32KeeperAddr}},
+			"borrower": {{ID: bech32BorrowerAddr}},
+		},
+		Additional: map[string][]string{
+			"collateral_type": []string{m.CollateralType},
+		},
+	}, nil
+}

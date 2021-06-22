@@ -1,9 +1,9 @@
 # ------------------------------------------------------------------------------
 # Builder Image
 # ------------------------------------------------------------------------------
-FROM golang:1.14 AS build
+FROM golang AS build
 
-WORKDIR /go/src/github.com/figment-networks/worker-cosmos/
+WORKDIR /go/src/github.com/figment-networks/worker-kava/
 
 COPY ./go.mod .
 COPY ./go.sum .
@@ -29,9 +29,11 @@ RUN \
 # ------------------------------------------------------------------------------
 # Target Image
 # ------------------------------------------------------------------------------
-FROM alpine:3.10 AS release
-
+FROM alpine AS release
+RUN adduser --system --uid 1234 figment
 WORKDIR /app/kava
 COPY --from=build /go/src/github.com/figment-networks/worker-kava/worker /app/kava/worker
 RUN chmod a+x ./worker
+RUN chown -R figment /app/
+USER 1234
 CMD ["./worker"]

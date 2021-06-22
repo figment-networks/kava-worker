@@ -1,0 +1,9 @@
+apiVersion: v2
+name: kava-worker-kava-7
+description: An indexer worker part dedicated for kava transactions
+type: application
+version: 0.1.0
+dependencies:
+  - name: common
+    repository: https://raw.githubusercontent.com/figment-networks/helm/main/_repo
+    version: "0.1.0"

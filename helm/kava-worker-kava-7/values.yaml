@@ -1,0 +1,62 @@
+global:
+  annotations:
+    figment.io/github_repository: "github.com/figment-networks/kava-worker"
+    ad.datadoghq.com/kava-worker.check_names: '["openmetrics"]'
+    ad.datadoghq.com/kava-worker.init_configs: '[{}]'
+    ad.datadoghq.com/kava-worker.instances: '[{
+        "prometheus_url": "http://%%host%%:8087/metrics",
+        "namespace": "workers",
+        "metrics": ["*"],
+        "send_distribution_buckets": true,
+        "tags": ["network:kava","chain_id:kava-7","group:indexer-workers","cluster:k8s"]
+      }]'
+  labels:
+    team: indexers
+    severity: noncritical
+
+deployments:
+  kava-worker-kava-7:
+    service:
+      ports:
+        http:
+          port: 8087
+          targetPort: 8087
+          protocol: TCP
+        grpc:
+          port: 3000
+          targetPort: 3000
+          protocol: TCP
+    replicas: 1
+    pod:
+      containers:
+        kava-worker-kava-7:
+          env:
+            APP_ENV: production
+            TENDERMINT_RPC_ADDR: http://54.39.106.156:26657
+            TENDERMINT_LCD_ADDR: http://54.39.106.156:1317
+            HOSTNAME:
+              fieldRef:
+                fieldPath: status.podIP
+            CHAIN_ID: kava-7
+            MANAGERS: indexer-manager.indexers.svc.cluster.local:8085
+            STORE_HTTP_ENDPOINTS: http://indexer-search.indexers.svc.cluster.local:8986/input/jsonrpc
+            MANAGER_INTERVAL: 10s
+            MAXIMUM_HEIGHTS_TO_GET: 10000
+            REQUESTS_PER_SECOND: 33
+            HEALTH_CHECK_INTERVAL: 10s
+            PORT: 3000
+            HTTP_PORT: 8087
+          livenessProbe:
+            httpGet:
+              path: /liveness
+              port: 8087
+          readinessProbe:
+            httpGet:
+              path: /readiness
+              port: 8087
+          resources:
+            requests:
+              memory: 200Mi
+              cpu: 500m
+            limits:
+              memory: 200Mi

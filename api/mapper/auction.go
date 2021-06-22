@@ -43,6 +43,6 @@ func AuctionPlaceBidToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEv
 		},
 	}
 
-	err = produceTransfers(&se, "send", logf)
+	err = produceTransfers(&se, "send", "", logf)
 	return se, nil
 }
