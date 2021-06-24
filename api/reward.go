@@ -9,7 +9,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/figment-networks/indexer-manager/structs"
+	rStructs "github.com/figment-networks/indexer-rewards/structs"
+	"github.com/figment-networks/indexer-search/structs"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
@@ -33,8 +34,8 @@ type validatorReward struct {
 const maxRetries = 3
 
 // GetReward fetches total rewards for delegator account
-func (c *Client) GetReward(ctx context.Context, params structs.HeightAccount) (resp structs.GetRewardResponse, err error) {
-	resp.Rewards = make(map[structs.Validator][]structs.TransactionAmount, 0)
+func (c *Client) GetReward(ctx context.Context, params structs.HeightAccount) (resp rStructs.GetRewardResponse, err error) {
+	resp.Rewards = make(rStructs.RewardsPerValidator)
 	resp.Height = params.Height
 	endpoint := fmt.Sprintf("/distribution/delegators/%v/rewards", params.Account)
 
@@ -94,11 +95,11 @@ func (c *Client) GetReward(ctx context.Context, params structs.HeightAccount) (r
 		return resp, err
 	}
 	for _, valReward := range result.Result.ValidatorRewards {
-		valRewards := make([]structs.TransactionAmount, 0, len(valReward.Rewards))
+		valRewards := make([]rStructs.RewardAmount, 0, len(valReward.Rewards))
 
 		for _, reward := range valReward.Rewards {
 			valRewards = append(valRewards,
-				structs.TransactionAmount{
+				rStructs.RewardAmount{
 					Text:     reward.Amount.String(),
 					Numeric:  reward.Amount.BigInt(),
 					Currency: reward.Denom,
@@ -106,7 +107,7 @@ func (c *Client) GetReward(ctx context.Context, params structs.HeightAccount) (r
 				},
 			)
 		}
-		resp.Rewards[structs.Validator(valReward.Validator)] = valRewards
+		resp.Rewards[rStructs.Validator(valReward.Validator)] = valRewards
 	}
 
 	return resp, err

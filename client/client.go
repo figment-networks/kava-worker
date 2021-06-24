@@ -9,13 +9,15 @@ import (
 
 	"github.com/figment-networks/indexing-engine/metrics"
 
-	"github.com/figment-networks/indexer-manager/structs"
+	mStructs "github.com/figment-networks/indexer-manager/structs"
+	rStructs "github.com/figment-networks/indexer-rewards/structs"
+	"github.com/figment-networks/indexer-search/structs"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 
 	cStructs "github.com/figment-networks/indexer-manager/worker/connectivity/structs"
-	"github.com/figment-networks/indexer-manager/worker/process/ranged"
-	"github.com/figment-networks/indexer-manager/worker/store"
+	"github.com/figment-networks/indexer-search/common/process/ranged"
+	"github.com/figment-networks/indexer-search/common/store"
 	"github.com/figment-networks/kava-worker/api"
 )
 
@@ -38,7 +40,7 @@ type RPC interface {
 }
 
 type LCD interface {
-	GetReward(ctx context.Context, params structs.HeightAccount) (resp structs.GetRewardResponse, err error)
+	GetReward(ctx context.Context, params structs.HeightAccount) (resp rStructs.GetRewardResponse, err error)
 }
 
 // IndexerClient is implementation of a client (main worker code)
@@ -51,12 +53,12 @@ type IndexerClient struct {
 	sLock   sync.Mutex
 
 	Reqester            *ranged.RangeRequester
-	storeClient         store.HeightStoreCaller
+	storeClient         store.SearchStoreCaller
 	maximumHeightsToGet uint64
 }
 
 // NewIndexerClient is IndexerClient constructor
-func NewIndexerClient(ctx context.Context, logger *zap.Logger, rpcCli RPC, lcdCli LCD, storeClient store.HeightStoreCaller, maximumHeightsToGet uint64) *IndexerClient {
+func NewIndexerClient(ctx context.Context, logger *zap.Logger, rpcCli RPC, lcdCli LCD, storeClient store.SearchStoreCaller, maximumHeightsToGet uint64) *IndexerClient {
 	getTransactionDuration = endpointDuration.WithLabels("getTransactions")
 	getLatestDuration = endpointDuration.WithLabels("getLatest")
 	getBlockDuration = endpointDuration.WithLabels("getBlock")
@@ -118,11 +120,11 @@ func (ic *IndexerClient) Run(ctx context.Context, stream *cStructs.StreamAccess)
 			receivedRequestsMetric.WithLabels(taskRequest.Type).Inc()
 			nCtx, cancel := context.WithTimeout(ctx, 5*time.Minute)
 			switch taskRequest.Type {
-			case structs.ReqIDGetTransactions:
+			case mStructs.ReqIDGetTransactions:
 				ic.GetTransactions(nCtx, taskRequest, stream, ic.rpcCli)
-			case structs.ReqIDGetLatestMark:
+			case mStructs.ReqIDGetLatestMark:
 				ic.GetLatestMark(nCtx, taskRequest, stream, ic.rpcCli)
-			case structs.ReqIDGetReward:
+			case mStructs.ReqIDGetReward:
 				ic.GetReward(nCtx, taskRequest, stream, ic.lcdCli)
 			default:
 				stream.Send(cStructs.TaskResponse{

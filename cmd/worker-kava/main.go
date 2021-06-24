@@ -17,7 +17,7 @@ import (
 	grpcIndexer "github.com/figment-networks/indexer-manager/worker/transport/grpc"
 	grpcProtoIndexer "github.com/figment-networks/indexer-manager/worker/transport/grpc/indexer"
 
-	httpStore "github.com/figment-networks/indexer-manager/worker/store/transport/http"
+	httpStore "github.com/figment-networks/indexer-search/common/store/transport/http"
 
 	"github.com/figment-networks/indexing-engine/health"
 	"github.com/figment-networks/indexing-engine/metrics"
@@ -113,7 +113,7 @@ func main() {
 	lcdClient := api.NewClient(cfg.TendermintLCDAddr, cfg.DatahubKey, logger.GetLogger(), nil, int(cfg.RequestsPerSecond))
 
 	storeEndpoints := strings.Split(cfg.StoreHTTPEndpoints, ",")
-	hStore := httpStore.NewHTTPJSONRPCHeightStore(storeEndpoints, &http.Client{})
+	hStore := httpStore.NewHTTPStore(storeEndpoints, &http.Client{})
 
 	workerClient := client.NewIndexerClient(ctx, logger.GetLogger(), rpcClient, lcdClient, hStore, uint64(cfg.MaximumHeightsToGet))
 

@@ -5,8 +5,9 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/figment-networks/indexer-manager/structs"
+	mStructs "github.com/figment-networks/indexer-manager/structs"
 	cStructs "github.com/figment-networks/indexer-manager/worker/connectivity/structs"
+	"github.com/figment-networks/indexer-search/structs"
 	"github.com/figment-networks/indexing-engine/metrics"
 	"go.uber.org/zap"
 )
@@ -17,7 +18,7 @@ func (ic *IndexerClient) GetLatestMark(ctx context.Context, tr cStructs.TaskRequ
 	timer := metrics.NewTimer(getLatestDuration)
 	defer timer.ObserveDuration()
 
-	ldr := &structs.LatestDataRequest{}
+	ldr := &mStructs.LatestDataRequest{}
 	err := json.Unmarshal(tr.Payload, ldr)
 	if err != nil {
 		stream.Send(cStructs.TaskResponse{Id: tr.Id, Error: cStructs.TaskError{Msg: "Cannot unmarshal payload"}, Final: true})
@@ -34,7 +35,7 @@ func (ic *IndexerClient) GetLatestMark(ctx context.Context, tr cStructs.TaskRequ
 	}
 
 	tResp := cStructs.TaskResponse{Id: tr.Id, Type: "LatestMark", Order: 0, Final: true}
-	tResp.Payload, err = json.Marshal(structs.LatestDataResponse{
+	tResp.Payload, err = json.Marshal(mStructs.LatestDataResponse{
 		LastHash:   block.Hash,
 		LastTime:   block.Time,
 		LastHeight: block.Height,
