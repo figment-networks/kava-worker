@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	shared "github.com/figment-networks/indexer-manager/structs"
+	"github.com/figment-networks/indexer-search/structs"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	crisis "github.com/cosmos/cosmos-sdk/x/crisis"
@@ -12,7 +12,7 @@ import (
 	"github.com/tendermint/tendermint/libs/bech32"
 )
 
-func CrisisVerifyInvariantToSub(msg sdk.Msg) (se shared.SubsetEvent, er error) {
+func CrisisVerifyInvariantToSub(msg sdk.Msg) (se structs.SubsetEvent, er error) {
 	mvi, ok := msg.(crisis.MsgVerifyInvariant)
 	if !ok {
 		return se, errors.New("Not a verify_invariant type")
@@ -23,11 +23,11 @@ func CrisisVerifyInvariantToSub(msg sdk.Msg) (se shared.SubsetEvent, er error) {
 		return se, fmt.Errorf("error converting SenderAddress: %w", err)
 	}
 
-	return shared.SubsetEvent{
+	return structs.SubsetEvent{
 		Type:   []string{"verify_invariant"},
 		Module: "crisis",
-		Sender: []shared.EventTransfer{{
-			Account: shared.Account{ID: bech32Addr},
+		Sender: []structs.EventTransfer{{
+			Account: structs.Account{ID: bech32Addr},
 		}},
 		Additional: map[string][]string{
 			"invariant_route":       {mvi.InvariantRoute},

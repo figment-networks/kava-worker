@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	shared "github.com/figment-networks/indexer-manager/structs"
+	"github.com/figment-networks/indexer-search/structs"
 	"github.com/figment-networks/kava-worker/api/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -14,7 +14,7 @@ import (
 	"github.com/tendermint/tendermint/libs/bech32"
 )
 
-func Bep3CreateAtomicSwapToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
+func Bep3CreateAtomicSwapToSub(msg sdk.Msg, logf types.LogFormat) (se structs.SubsetEvent, err error) {
 	m, ok := msg.(bep3.MsgCreateAtomicSwap)
 	if !ok {
 		return se, errors.New("Not a createAtomicSwap type")
@@ -29,10 +29,10 @@ func Bep3CreateAtomicSwapToSub(msg sdk.Msg, logf types.LogFormat) (se shared.Sub
 		return se, fmt.Errorf("error converting ToAddress: %w", err)
 	}
 
-	se = shared.SubsetEvent{
+	se = structs.SubsetEvent{
 		Type:   []string{"create_atomic_swap"},
 		Module: "bep3",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"from": {{ID: bech32FromAddr}},
 			"to":   {{ID: bech32ToAddr}},
 		},
@@ -45,10 +45,10 @@ func Bep3CreateAtomicSwapToSub(msg sdk.Msg, logf types.LogFormat) (se shared.Sub
 		},
 	}
 
-	txAmount := map[string]shared.TransactionAmount{}
+	txAmount := map[string]structs.TransactionAmount{}
 
 	for i, coin := range m.Amount {
-		am := shared.TransactionAmount{
+		am := structs.TransactionAmount{
 			Currency: coin.Denom,
 			Numeric:  coin.Amount.BigInt(),
 			Text:     coin.Amount.String(),
@@ -67,7 +67,7 @@ func Bep3CreateAtomicSwapToSub(msg sdk.Msg, logf types.LogFormat) (se shared.Sub
 	return se, nil
 }
 
-func Bep3ClaimAtomicSwapToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func Bep3ClaimAtomicSwapToSub(msg sdk.Msg) (se structs.SubsetEvent, err error) {
 	m, ok := msg.(bep3.MsgClaimAtomicSwap)
 	if !ok {
 		return se, errors.New("Not a claimAtomicSwap type")
@@ -78,10 +78,10 @@ func Bep3ClaimAtomicSwapToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 		return se, fmt.Errorf("error converting FromAddress: %w", err)
 	}
 
-	return shared.SubsetEvent{
+	return structs.SubsetEvent{
 		Type:   []string{"claim_atomic_swap"},
 		Module: "bep3",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"from": {{ID: bech32Addr}},
 		},
 		Additional: map[string][]string{
@@ -91,7 +91,7 @@ func Bep3ClaimAtomicSwapToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	}, nil
 }
 
-func Bep3RefundAtomicSwapToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
+func Bep3RefundAtomicSwapToSub(msg sdk.Msg, logf types.LogFormat) (se structs.SubsetEvent, err error) {
 	m, ok := msg.(bep3.MsgRefundAtomicSwap)
 	if !ok {
 		return se, errors.New("Not a refundAtomicSwap type")
@@ -102,10 +102,10 @@ func Bep3RefundAtomicSwapToSub(msg sdk.Msg, logf types.LogFormat) (se shared.Sub
 		return se, fmt.Errorf("error converting FromAddress: %w", err)
 	}
 
-	se = shared.SubsetEvent{
+	se = structs.SubsetEvent{
 		Type:   []string{"refund_atomic_swap"},
 		Module: "bep3",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"from": {{ID: bech32Addr}},
 		},
 		Additional: map[string][]string{

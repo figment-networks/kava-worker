@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	shared "github.com/figment-networks/indexer-manager/structs"
+	"github.com/figment-networks/indexer-search/structs"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/kava-labs/kava/app"
@@ -12,7 +12,7 @@ import (
 	"github.com/tendermint/tendermint/libs/bech32"
 )
 
-func PricefeedPostPrice(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func PricefeedPostPrice(msg sdk.Msg) (se structs.SubsetEvent, err error) {
 	m, ok := msg.(pricefeed.MsgPostPrice)
 	if !ok {
 		return se, errors.New("Not a post_price type")
@@ -23,13 +23,13 @@ func PricefeedPostPrice(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 		return se, fmt.Errorf("error converting Address: %w", err)
 	}
 
-	return shared.SubsetEvent{
+	return structs.SubsetEvent{
 		Type:   []string{"post_price"},
 		Module: "pricefeed",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"from": {{ID: bech32Addr}},
 		},
-		Amount: map[string]shared.TransactionAmount{
+		Amount: map[string]structs.TransactionAmount{
 			"value": {
 				Currency: m.MarketID, // todo "xrp:usd" should this be split?
 				Numeric:  m.Price.BigInt(),

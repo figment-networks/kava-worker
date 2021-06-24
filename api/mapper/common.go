@@ -5,8 +5,7 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/figment-networks/indexer-manager/structs"
-	shared "github.com/figment-networks/indexer-manager/structs"
+	"github.com/figment-networks/indexer-search/structs"
 	"github.com/figment-networks/kava-worker/api/types"
 	"github.com/figment-networks/kava-worker/api/util"
 
@@ -41,7 +40,7 @@ func produceTransfers(se *structs.SubsetEvent, transferType, skipAddr string, lo
 			}
 
 			for _, amount := range strings.Split(attr.Amount[0], ",") {
-				attrAmt := shared.TransactionAmount{Numeric: &big.Int{}}
+				attrAmt := structs.TransactionAmount{Numeric: &big.Int{}}
 				sliced := util.GetCurrency(amount)
 				var (
 					c       *big.Int

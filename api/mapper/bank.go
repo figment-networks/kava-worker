@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	shared "github.com/figment-networks/indexer-manager/structs"
+	"github.com/figment-networks/indexer-search/structs"
 	"github.com/figment-networks/kava-worker/api/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -13,14 +13,14 @@ import (
 	"github.com/tendermint/tendermint/libs/bech32"
 )
 
-func BankMultisendToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
+func BankMultisendToSub(msg sdk.Msg, logf types.LogFormat) (se structs.SubsetEvent, err error) {
 
 	multisend, ok := msg.(bank.MsgMultiSend)
 	if !ok {
 		return se, errors.New("Not a multisend type")
 	}
 
-	se = shared.SubsetEvent{
+	se = structs.SubsetEvent{
 		Type:   []string{"multisend"},
 		Module: "bank",
 	}
@@ -44,13 +44,13 @@ func BankMultisendToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEven
 	return se, err
 }
 
-func BankSendToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
+func BankSendToSub(msg sdk.Msg, logf types.LogFormat) (se structs.SubsetEvent, err error) {
 	send, ok := msg.(bank.MsgSend)
 	if !ok {
 		return se, errors.New("Not a send type")
 	}
 
-	se = shared.SubsetEvent{
+	se = structs.SubsetEvent{
 		Type:   []string{"send"},
 		Module: "bank",
 	}
@@ -65,19 +65,19 @@ func BankSendToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, er
 	return se, err
 }
 
-func bankProduceEvTx(account sdk.AccAddress, coins sdk.Coins) (evt shared.EventTransfer, err error) {
+func bankProduceEvTx(account sdk.AccAddress, coins sdk.Coins) (evt structs.EventTransfer, err error) {
 	bech32Addr, err := bech32.ConvertAndEncode(app.Bech32MainPrefix, account.Bytes())
 	if err != nil {
 		return evt, fmt.Errorf("error converting Address: %w", err)
 	}
 
-	evt = shared.EventTransfer{
-		Account: shared.Account{ID: bech32Addr},
+	evt = structs.EventTransfer{
+		Account: structs.Account{ID: bech32Addr},
 	}
 	if len(coins) > 0 {
-		evt.Amounts = []shared.TransactionAmount{}
+		evt.Amounts = []structs.TransactionAmount{}
 		for _, coin := range coins {
-			evt.Amounts = append(evt.Amounts, shared.TransactionAmount{
+			evt.Amounts = append(evt.Amounts, structs.TransactionAmount{
 				Currency: coin.Denom,
 				Numeric:  coin.Amount.BigInt(),
 				Text:     coin.Amount.String(),

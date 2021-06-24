@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	shared "github.com/figment-networks/indexer-manager/structs"
+	"github.com/figment-networks/indexer-search/structs"
 	"github.com/figment-networks/kava-worker/api/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -14,7 +14,7 @@ import (
 	"github.com/tendermint/tendermint/libs/bech32"
 )
 
-func HardDepositToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
+func HardDepositToSub(msg sdk.Msg, logf types.LogFormat) (se structs.SubsetEvent, err error) {
 	m, ok := msg.(hard.MsgDeposit)
 	if !ok {
 		return se, errors.New("Not a hard_deposit type")
@@ -25,10 +25,10 @@ func HardDepositToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent,
 		return se, fmt.Errorf("error converting Depositor address: %w", err)
 	}
 
-	se = shared.SubsetEvent{
+	se = structs.SubsetEvent{
 		Type:   []string{"hard_deposit"},
 		Module: "hard",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"depositor": {{ID: bech32Addr}},
 		},
 		Amount: hardProduceAmounts(m.Amount),
@@ -38,7 +38,7 @@ func HardDepositToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent,
 	return se, err
 }
 
-func HardWithdrawToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
+func HardWithdrawToSub(msg sdk.Msg, logf types.LogFormat) (se structs.SubsetEvent, err error) {
 	m, ok := msg.(hard.MsgWithdraw)
 	if !ok {
 		return se, errors.New("Not a hard_withdraw type")
@@ -49,10 +49,10 @@ func HardWithdrawToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent
 		return se, fmt.Errorf("error converting Depositor Address: %w", err)
 	}
 
-	se = shared.SubsetEvent{
+	se = structs.SubsetEvent{
 		Type:   []string{"hard_withdraw"},
 		Module: "hard",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"depositor": {{ID: bech32Addr}},
 		},
 		Amount: hardProduceAmounts(m.Amount),
@@ -62,7 +62,7 @@ func HardWithdrawToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent
 	return se, err
 }
 
-func HardBorrowToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
+func HardBorrowToSub(msg sdk.Msg, logf types.LogFormat) (se structs.SubsetEvent, err error) {
 	m, ok := msg.(hard.MsgBorrow)
 	if !ok {
 		return se, errors.New("Not a hard_borrow type")
@@ -73,10 +73,10 @@ func HardBorrowToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, 
 		return se, fmt.Errorf("error converting Borrower address: %w", err)
 	}
 
-	se = shared.SubsetEvent{
+	se = structs.SubsetEvent{
 		Type:   []string{"hard_borrow"},
 		Module: "hard",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"borrower": {{ID: bech32Addr}},
 		},
 		Amount: hardProduceAmounts(m.Amount),
@@ -86,7 +86,7 @@ func HardBorrowToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, 
 	return se, err
 }
 
-func HardRepayToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
+func HardRepayToSub(msg sdk.Msg, logf types.LogFormat) (se structs.SubsetEvent, err error) {
 	m, ok := msg.(hard.MsgRepay)
 	if !ok {
 		return se, errors.New("Not a hard_repay type")
@@ -102,10 +102,10 @@ func HardRepayToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, e
 		return se, fmt.Errorf("error converting Owner address: %w", err)
 	}
 
-	se = shared.SubsetEvent{
+	se = structs.SubsetEvent{
 		Type:   []string{"hard_repay"},
 		Module: "hard",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"sender": {{ID: bech32Addr}},
 			"owner":  {{ID: bech32OwnerAddr}},
 		},
@@ -116,7 +116,7 @@ func HardRepayToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, e
 	return se, err
 }
 
-func HardLiquidateToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
+func HardLiquidateToSub(msg sdk.Msg, logf types.LogFormat) (se structs.SubsetEvent, err error) {
 	m, ok := msg.(hard.MsgLiquidate)
 	if !ok {
 		return se, errors.New("Not a hard_liquidate type")
@@ -132,10 +132,10 @@ func HardLiquidateToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEven
 		return se, fmt.Errorf("error converting Borrower address: %w", err)
 	}
 
-	se = shared.SubsetEvent{
+	se = structs.SubsetEvent{
 		Type:   []string{"hard_liquidate"},
 		Module: "hard",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"keeper":   {{ID: bech32Addr}},
 			"borrower": {{ID: bech32BorrowerAddr}},
 		},
@@ -145,12 +145,12 @@ func HardLiquidateToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEven
 	return se, err
 }
 
-func hardProduceAmounts(coins sdk.Coins) map[string]shared.TransactionAmount {
+func hardProduceAmounts(coins sdk.Coins) map[string]structs.TransactionAmount {
 
 	if len(coins) > 0 {
-		txAm := make(map[string]shared.TransactionAmount)
+		txAm := make(map[string]structs.TransactionAmount)
 		for i, coin := range coins {
-			txAm[strconv.Itoa(i)] = shared.TransactionAmount{
+			txAm[strconv.Itoa(i)] = structs.TransactionAmount{
 				Currency: coin.Denom,
 				Numeric:  coin.Amount.BigInt(),
 				Text:     coin.Amount.String(),

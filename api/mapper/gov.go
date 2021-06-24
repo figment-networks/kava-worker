@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	shared "github.com/figment-networks/indexer-manager/structs"
+	"github.com/figment-networks/indexer-search/structs"
 	"github.com/figment-networks/kava-worker/api/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -14,7 +14,7 @@ import (
 	"github.com/tendermint/tendermint/libs/bech32"
 )
 
-func GovDepositToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
+func GovDepositToSub(msg sdk.Msg, logf types.LogFormat) (se structs.SubsetEvent, err error) {
 	dep, ok := msg.(gov.MsgDeposit)
 	if !ok {
 		return se, errors.New("Not a deposit type")
@@ -25,18 +25,18 @@ func GovDepositToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, 
 		return se, fmt.Errorf("error converting DepositorAddress: %w", err)
 	}
 
-	se = shared.SubsetEvent{
+	se = structs.SubsetEvent{
 		Type:       []string{"deposit"},
 		Module:     "gov",
-		Node:       map[string][]shared.Account{"depositor": {{ID: bech32Addr}}},
+		Node:       map[string][]structs.Account{"depositor": {{ID: bech32Addr}}},
 		Additional: map[string][]string{"proposalID": {strconv.FormatUint(dep.ProposalID, 10)}},
 	}
 
-	sender := shared.EventTransfer{Account: shared.Account{ID: bech32Addr}}
-	txAmount := map[string]shared.TransactionAmount{}
+	sender := structs.EventTransfer{Account: structs.Account{ID: bech32Addr}}
+	txAmount := map[string]structs.TransactionAmount{}
 
 	for i, coin := range dep.Amount {
-		am := shared.TransactionAmount{
+		am := structs.TransactionAmount{
 			Currency: coin.Denom,
 			Numeric:  coin.Amount.BigInt(),
 			Text:     coin.Amount.String(),
@@ -51,14 +51,14 @@ func GovDepositToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, 
 		txAmount[key] = am
 	}
 
-	se.Sender = []shared.EventTransfer{sender}
+	se.Sender = []structs.EventTransfer{sender}
 	se.Amount = txAmount
 
 	err = produceTransfers(&se, "send", "", logf)
 	return se, err
 }
 
-func GovVoteToSub(msg sdk.Msg) (se shared.SubsetEvent, er error) {
+func GovVoteToSub(msg sdk.Msg) (se structs.SubsetEvent, er error) {
 	vote, ok := msg.(gov.MsgVote)
 	if !ok {
 		return se, errors.New("Not a vote type")
@@ -69,10 +69,10 @@ func GovVoteToSub(msg sdk.Msg) (se shared.SubsetEvent, er error) {
 		return se, fmt.Errorf("error converting VoterAddress: %w", err)
 	}
 
-	return shared.SubsetEvent{
+	return structs.SubsetEvent{
 		Type:   []string{"vote"},
 		Module: "gov",
-		Node:   map[string][]shared.Account{"voter": {{ID: bech32Addr}}},
+		Node:   map[string][]structs.Account{"voter": {{ID: bech32Addr}}},
 		Additional: map[string][]string{
 			"proposalID": {strconv.FormatUint(vote.ProposalID, 10)},
 			"option":     {vote.Option.String()},
@@ -80,7 +80,7 @@ func GovVoteToSub(msg sdk.Msg) (se shared.SubsetEvent, er error) {
 	}, nil
 }
 
-func GovSubmitProposalToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
+func GovSubmitProposalToSub(msg sdk.Msg, logf types.LogFormat) (se structs.SubsetEvent, err error) {
 	sp, ok := msg.(gov.MsgSubmitProposal)
 	if !ok {
 		return se, errors.New("Not a submit_proposal type")
@@ -91,17 +91,17 @@ func GovSubmitProposalToSub(msg sdk.Msg, logf types.LogFormat) (se shared.Subset
 		return se, fmt.Errorf("error converting ProposerAddress: %w", err)
 	}
 
-	se = shared.SubsetEvent{
+	se = structs.SubsetEvent{
 		Type:   []string{"submit_proposal"},
 		Module: "gov",
-		Node:   map[string][]shared.Account{"proposer": {{ID: bech32Addr}}},
+		Node:   map[string][]structs.Account{"proposer": {{ID: bech32Addr}}},
 	}
 
-	sender := shared.EventTransfer{Account: shared.Account{ID: bech32Addr}}
-	txAmount := map[string]shared.TransactionAmount{}
+	sender := structs.EventTransfer{Account: structs.Account{ID: bech32Addr}}
+	txAmount := map[string]structs.TransactionAmount{}
 
 	for i, coin := range sp.InitialDeposit {
-		am := shared.TransactionAmount{
+		am := structs.TransactionAmount{
 			Currency: coin.Denom,
 			Numeric:  coin.Amount.BigInt(),
 			Text:     coin.Amount.String(),
@@ -115,7 +115,7 @@ func GovSubmitProposalToSub(msg sdk.Msg, logf types.LogFormat) (se shared.Subset
 
 		txAmount[key] = am
 	}
-	se.Sender = []shared.EventTransfer{sender}
+	se.Sender = []structs.EventTransfer{sender}
 	se.Amount = txAmount
 
 	se.Additional = map[string][]string{}

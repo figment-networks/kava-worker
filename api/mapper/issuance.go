@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	shared "github.com/figment-networks/indexer-manager/structs"
+	"github.com/figment-networks/indexer-search/structs"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/kava-labs/kava/app"
@@ -13,7 +13,7 @@ import (
 	"github.com/tendermint/tendermint/libs/bech32"
 )
 
-func IssuanceIssueTokensToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func IssuanceIssueTokensToSub(msg sdk.Msg) (se structs.SubsetEvent, err error) {
 	m, ok := msg.(issuance.MsgIssueTokens)
 	if !ok {
 		return se, errors.New("Not a issue_tokens type")
@@ -29,14 +29,14 @@ func IssuanceIssueTokensToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 		return se, fmt.Errorf("error converting ReceiverAddress: %w", err)
 	}
 
-	return shared.SubsetEvent{
+	return structs.SubsetEvent{
 		Type:   []string{"issue_tokens"},
 		Module: "issuance",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"sender":   {{ID: bech32SenderAddr}},
 			"receiver": {{ID: bech32RecAddr}},
 		},
-		Amount: map[string]shared.TransactionAmount{
+		Amount: map[string]structs.TransactionAmount{
 			"send": {
 				Currency: m.Tokens.Denom,
 				Numeric:  m.Tokens.Amount.BigInt(),
@@ -46,7 +46,7 @@ func IssuanceIssueTokensToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	}, nil
 }
 
-func IssuanceRedeemTokensToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func IssuanceRedeemTokensToSub(msg sdk.Msg) (se structs.SubsetEvent, err error) {
 	m, ok := msg.(issuance.MsgRedeemTokens)
 	if !ok {
 		return se, errors.New("Not a redeem_tokens type")
@@ -57,13 +57,13 @@ func IssuanceRedeemTokensToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 		return se, fmt.Errorf("error converting SenderAddress: %w", err)
 	}
 
-	return shared.SubsetEvent{
+	return structs.SubsetEvent{
 		Type:   []string{"redeem_tokens"},
 		Module: "issuance",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"sender": {{ID: bech32SenderAddr}},
 		},
-		Amount: map[string]shared.TransactionAmount{
+		Amount: map[string]structs.TransactionAmount{
 			"send": {
 				Currency: m.Tokens.Denom,
 				Numeric:  m.Tokens.Amount.BigInt(),
@@ -73,7 +73,7 @@ func IssuanceRedeemTokensToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	}, nil
 }
 
-func IssuanceBlockAddressToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func IssuanceBlockAddressToSub(msg sdk.Msg) (se structs.SubsetEvent, err error) {
 	m, ok := msg.(issuance.MsgBlockAddress)
 	if !ok {
 		return se, errors.New("Not a block_address type")
@@ -89,10 +89,10 @@ func IssuanceBlockAddressToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 		return se, fmt.Errorf("error converting Address: %w", err)
 	}
 
-	return shared.SubsetEvent{
+	return structs.SubsetEvent{
 		Type:   []string{"block_address"},
 		Module: "issuance",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"sender":          {{ID: bech32SenderAddr}},
 			"blocked_address": {{ID: bech32Addr}},
 		},
@@ -102,7 +102,7 @@ func IssuanceBlockAddressToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	}, nil
 }
 
-func IssuanceUnblockAddressToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func IssuanceUnblockAddressToSub(msg sdk.Msg) (se structs.SubsetEvent, err error) {
 	m, ok := msg.(issuance.MsgBlockAddress)
 	if !ok {
 		return se, errors.New("Not a unblock_address type")
@@ -118,10 +118,10 @@ func IssuanceUnblockAddressToSub(msg sdk.Msg) (se shared.SubsetEvent, err error)
 		return se, fmt.Errorf("error converting Address: %w", err)
 	}
 
-	return shared.SubsetEvent{
+	return structs.SubsetEvent{
 		Type:   []string{"unblock_address"},
 		Module: "issuance",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"sender":  {{ID: bech32SenderAddr}},
 			"address": {{ID: bech32Addr}},
 		},
@@ -131,7 +131,7 @@ func IssuanceUnblockAddressToSub(msg sdk.Msg) (se shared.SubsetEvent, err error)
 	}, nil
 }
 
-func IssuanceMsgSetPauseStatusToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func IssuanceMsgSetPauseStatusToSub(msg sdk.Msg) (se structs.SubsetEvent, err error) {
 	m, ok := msg.(issuance.MsgSetPauseStatus)
 	if !ok {
 		return se, errors.New("Not a change_pause_status type")
@@ -142,10 +142,10 @@ func IssuanceMsgSetPauseStatusToSub(msg sdk.Msg) (se shared.SubsetEvent, err err
 		return se, fmt.Errorf("error converting SenderAddress: %w", err)
 	}
 
-	return shared.SubsetEvent{
+	return structs.SubsetEvent{
 		Type:   []string{"change_pause_status"},
 		Module: "issuance",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"sender": {{ID: bech32SenderAddr}},
 		},
 		Additional: map[string][]string{

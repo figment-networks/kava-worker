@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	shared "github.com/figment-networks/indexer-manager/structs"
+	"github.com/figment-networks/indexer-search/structs"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/kava-labs/kava/app"
@@ -12,7 +12,7 @@ import (
 	"github.com/tendermint/tendermint/libs/bech32"
 )
 
-func CDPCreateCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func CDPCreateCDPToSub(msg sdk.Msg) (se structs.SubsetEvent, err error) {
 	m, ok := msg.(cdp.MsgCreateCDP)
 	if !ok {
 		return se, errors.New("Not a create_cdp type")
@@ -23,13 +23,13 @@ func CDPCreateCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 		return se, fmt.Errorf("error converting SenderAddress: %w", err)
 	}
 
-	return shared.SubsetEvent{
+	return structs.SubsetEvent{
 		Type:   []string{"create_cdp"},
 		Module: "cdp",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"sender": {{ID: bech32Addr}},
 		},
-		Amount: map[string]shared.TransactionAmount{
+		Amount: map[string]structs.TransactionAmount{
 			"collateral": {
 				Currency: m.Collateral.Denom,
 				Numeric:  m.Collateral.Amount.BigInt(),
@@ -47,7 +47,7 @@ func CDPCreateCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	}, nil
 }
 
-func CDPDepositCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func CDPDepositCDPToSub(msg sdk.Msg) (se structs.SubsetEvent, err error) {
 	m, ok := msg.(cdp.MsgDeposit)
 	if !ok {
 		return se, errors.New("Not a deposit_cdp type")
@@ -63,14 +63,14 @@ func CDPDepositCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 		return se, fmt.Errorf("error converting OwnerAddress: %w", err)
 	}
 
-	return shared.SubsetEvent{
+	return structs.SubsetEvent{
 		Type:   []string{"deposit_cdp"},
 		Module: "cdp",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"depositor": {{ID: bech32DepositorAddr}},
 			"owner":     {{ID: bech32OwnerAddr}},
 		},
-		Amount: map[string]shared.TransactionAmount{
+		Amount: map[string]structs.TransactionAmount{
 			"collateral": {
 				Currency: m.Collateral.Denom,
 				Numeric:  m.Collateral.Amount.BigInt(),
@@ -83,7 +83,7 @@ func CDPDepositCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	}, nil
 }
 
-func CDPWithdrawCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func CDPWithdrawCDPToSub(msg sdk.Msg) (se structs.SubsetEvent, err error) {
 	m, ok := msg.(cdp.MsgWithdraw)
 	if !ok {
 		return se, errors.New("Not a withdraw_cdp type")
@@ -99,14 +99,14 @@ func CDPWithdrawCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 		return se, fmt.Errorf("error converting OwnerAddress: %w", err)
 	}
 
-	return shared.SubsetEvent{
+	return structs.SubsetEvent{
 		Type:   []string{"withdraw_cdp"},
 		Module: "cdp",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"depositor": {{ID: bech32DepositorAddr}},
 			"owner":     {{ID: bech32OwnerAddr}},
 		},
-		Amount: map[string]shared.TransactionAmount{
+		Amount: map[string]structs.TransactionAmount{
 			"collateral": {
 				Currency: m.Collateral.Denom,
 				Numeric:  m.Collateral.Amount.BigInt(),
@@ -119,7 +119,7 @@ func CDPWithdrawCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	}, nil
 }
 
-func CDPDrawCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func CDPDrawCDPToSub(msg sdk.Msg) (se structs.SubsetEvent, err error) {
 	m, ok := msg.(cdp.MsgDrawDebt)
 	if !ok {
 		return se, errors.New("Not a draw_cdp type")
@@ -130,13 +130,13 @@ func CDPDrawCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 		return se, fmt.Errorf("error converting SenderAddress: %w", err)
 	}
 
-	return shared.SubsetEvent{
+	return structs.SubsetEvent{
 		Type:   []string{"draw_cdp"},
 		Module: "cdp",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"sender": {{ID: bech32Addr}},
 		},
-		Amount: map[string]shared.TransactionAmount{
+		Amount: map[string]structs.TransactionAmount{
 			"principal": {
 				Currency: m.Principal.Denom,
 				Numeric:  m.Principal.Amount.BigInt(),
@@ -149,7 +149,7 @@ func CDPDrawCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	}, nil
 }
 
-func CDPRepayCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func CDPRepayCDPToSub(msg sdk.Msg) (se structs.SubsetEvent, err error) {
 	m, ok := msg.(cdp.MsgRepayDebt)
 	if !ok {
 		return se, errors.New("Not a repay_cdp type")
@@ -160,13 +160,13 @@ func CDPRepayCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 		return se, fmt.Errorf("error converting SenderAddress: %w", err)
 	}
 
-	return shared.SubsetEvent{
+	return structs.SubsetEvent{
 		Type:   []string{"repay_cdp"},
 		Module: "cdp",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"sender": {{ID: bech32Addr}},
 		},
-		Amount: map[string]shared.TransactionAmount{
+		Amount: map[string]structs.TransactionAmount{
 			"payment": {
 				Currency: m.Payment.Denom,
 				Numeric:  m.Payment.Amount.BigInt(),
@@ -179,7 +179,7 @@ func CDPRepayCDPToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	}, nil
 }
 
-func CDPLiquidateToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func CDPLiquidateToSub(msg sdk.Msg) (se structs.SubsetEvent, err error) {
 	m, ok := msg.(cdp.MsgLiquidate)
 	if !ok {
 		return se, errors.New("Not a liquidate type")
@@ -195,10 +195,10 @@ func CDPLiquidateToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 		return se, fmt.Errorf("error converting BorrowerAddress: %w", err)
 	}
 
-	return shared.SubsetEvent{
+	return structs.SubsetEvent{
 		Type:   []string{"liquidate"},
 		Module: "cdp",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"keeper":   {{ID: bech32KeeperAddr}},
 			"borrower": {{ID: bech32BorrowerAddr}},
 		},

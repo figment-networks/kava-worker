@@ -4,14 +4,14 @@ import (
 	"errors"
 	"fmt"
 
-	shared "github.com/figment-networks/indexer-manager/structs"
+	"github.com/figment-networks/indexer-search/structs"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	slashing "github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/tendermint/tendermint/libs/bech32"
 )
 
-func SlashingUnjailToSub(msg sdk.Msg) (se shared.SubsetEvent, er error) {
+func SlashingUnjailToSub(msg sdk.Msg) (se structs.SubsetEvent, er error) {
 	unjail, ok := msg.(slashing.MsgUnjail)
 	if !ok {
 		return se, errors.New("Not an unjail type")
@@ -22,9 +22,9 @@ func SlashingUnjailToSub(msg sdk.Msg) (se shared.SubsetEvent, er error) {
 		return se, fmt.Errorf("error converting ValidatorAddr: %w", err)
 	}
 
-	return shared.SubsetEvent{
+	return structs.SubsetEvent{
 		Type:   []string{"unjail"},
 		Module: "slashing",
-		Node:   map[string][]shared.Account{"validator": {{ID: bech32Addr}}},
+		Node:   map[string][]structs.Account{"validator": {{ID: bech32Addr}}},
 	}, nil
 }

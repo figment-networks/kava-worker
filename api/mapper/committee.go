@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	shared "github.com/figment-networks/indexer-manager/structs"
+	"github.com/figment-networks/indexer-search/structs"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/kava-labs/kava/app"
@@ -13,7 +13,7 @@ import (
 	"github.com/tendermint/tendermint/libs/bech32"
 )
 
-func CommitteeSubmitProposalToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func CommitteeSubmitProposalToSub(msg sdk.Msg) (se structs.SubsetEvent, err error) {
 	m, ok := msg.(committee.MsgSubmitProposal)
 	if !ok {
 		return se, errors.New("Not a commmittee_submit_proposal type")
@@ -24,10 +24,10 @@ func CommitteeSubmitProposalToSub(msg sdk.Msg) (se shared.SubsetEvent, err error
 		return se, fmt.Errorf("error converting ProposerAddress: %w", err)
 	}
 
-	se = shared.SubsetEvent{
+	se = structs.SubsetEvent{
 		Type:   []string{"commmittee_submit_proposal"},
 		Module: "commmittee",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"proposer": {{ID: bech32Addr}},
 		},
 	}
@@ -53,7 +53,7 @@ func CommitteeSubmitProposalToSub(msg sdk.Msg) (se shared.SubsetEvent, err error
 	return se, nil
 }
 
-func CommitteeVoteToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func CommitteeVoteToSub(msg sdk.Msg) (se structs.SubsetEvent, err error) {
 	m, ok := msg.(committee.MsgVote)
 	if !ok {
 		return se, errors.New("Not a committee_vote type")
@@ -64,10 +64,10 @@ func CommitteeVoteToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 		return se, fmt.Errorf("error converting VoterAddress: %w", err)
 	}
 
-	return shared.SubsetEvent{
+	return structs.SubsetEvent{
 		Type:   []string{"committee_vote"},
 		Module: "commmittee",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"vote": {{ID: bech32Addr}},
 		},
 		Additional: map[string][]string{

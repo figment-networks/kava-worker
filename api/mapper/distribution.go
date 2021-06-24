@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"math/big"
 
-	shared "github.com/figment-networks/indexer-manager/structs"
+	"github.com/figment-networks/indexer-search/structs"
 	"github.com/figment-networks/kava-worker/api/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -17,7 +17,7 @@ import (
 
 var zero big.Int
 
-func DistributionWithdrawValidatorCommissionToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
+func DistributionWithdrawValidatorCommissionToSub(msg sdk.Msg, logf types.LogFormat) (se structs.SubsetEvent, err error) {
 	wvc, ok := msg.(distribution.MsgWithdrawValidatorCommission)
 	if !ok {
 		return se, errors.New("Not a withdraw_validator_commission type")
@@ -28,12 +28,12 @@ func DistributionWithdrawValidatorCommissionToSub(msg sdk.Msg, logf types.LogFor
 		return se, fmt.Errorf("error converting ValidatorAddress: %w", err)
 	}
 
-	se = shared.SubsetEvent{
+	se = structs.SubsetEvent{
 		Type:   []string{"withdraw_validator_commission"},
 		Module: "distribution",
-		Node:   map[string][]shared.Account{"validator": {{ID: bech32Addr}}},
-		Recipient: []shared.EventTransfer{{
-			Account: shared.Account{ID: bech32Addr},
+		Node:   map[string][]structs.Account{"validator": {{ID: bech32Addr}}},
+		Recipient: []structs.EventTransfer{{
+			Account: structs.Account{ID: bech32Addr},
 		}},
 	}
 
@@ -41,7 +41,7 @@ func DistributionWithdrawValidatorCommissionToSub(msg sdk.Msg, logf types.LogFor
 	return se, err
 }
 
-func DistributionSetWithdrawAddressToSub(msg sdk.Msg) (se shared.SubsetEvent, er error) {
+func DistributionSetWithdrawAddressToSub(msg sdk.Msg) (se structs.SubsetEvent, er error) {
 	swa, ok := msg.(distribution.MsgSetWithdrawAddress)
 	if !ok {
 		return se, errors.New("Not a set_withdraw_address type")
@@ -57,17 +57,17 @@ func DistributionSetWithdrawAddressToSub(msg sdk.Msg) (se shared.SubsetEvent, er
 		return se, fmt.Errorf("error converting WithdrawAddress: %w", err)
 	}
 
-	return shared.SubsetEvent{
+	return structs.SubsetEvent{
 		Type:   []string{"set_withdraw_address"},
 		Module: "distribution",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"delegator": {{ID: bech32DelAddr}},
 			"withdraw":  {{ID: bech32WithdrawAddr}},
 		},
 	}, nil
 }
 
-func DistributionWithdrawDelegatorRewardToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
+func DistributionWithdrawDelegatorRewardToSub(msg sdk.Msg, logf types.LogFormat) (se structs.SubsetEvent, err error) {
 	wdr, ok := msg.(distribution.MsgWithdrawDelegatorReward)
 	if !ok {
 		return se, errors.New("Not a withdraw_validator_commission type")
@@ -81,15 +81,15 @@ func DistributionWithdrawDelegatorRewardToSub(msg sdk.Msg, logf types.LogFormat)
 		return se, fmt.Errorf("error converting ValidatorAddress: %w", err)
 	}
 
-	se = shared.SubsetEvent{
+	se = structs.SubsetEvent{
 		Type:   []string{"withdraw_delegator_reward"},
 		Module: "distribution",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"delegator": {{ID: bech32DelAddr}},
 			"validator": {{ID: bech32ValAddr}},
 		},
-		Recipient: []shared.EventTransfer{{
-			Account: shared.Account{ID: bech32DelAddr},
+		Recipient: []structs.EventTransfer{{
+			Account: structs.Account{ID: bech32DelAddr},
 		}},
 	}
 
@@ -97,7 +97,7 @@ func DistributionWithdrawDelegatorRewardToSub(msg sdk.Msg, logf types.LogFormat)
 	return se, err
 }
 
-func DistributionFundCommunityPoolToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, er error) {
+func DistributionFundCommunityPoolToSub(msg sdk.Msg, logf types.LogFormat) (se structs.SubsetEvent, er error) {
 	fcp, ok := msg.(distributiontypes.MsgFundCommunityPool)
 	if !ok {
 		return se, errors.New("Not a withdraw_validator_commission type")
@@ -109,26 +109,26 @@ func DistributionFundCommunityPoolToSub(msg sdk.Msg, logf types.LogFormat) (se s
 	}
 
 	evt, err := distributionProduceEvTx(fcp.Depositor, fcp.Amount)
-	se = shared.SubsetEvent{
+	se = structs.SubsetEvent{
 		Type:   []string{"fund_community_pool"},
 		Module: "distribution",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"depositor": {{ID: bech32Addr}},
 		},
-		Sender: []shared.EventTransfer{evt},
+		Sender: []structs.EventTransfer{evt},
 	}
 	err = produceTransfers(&se, "send", "", logf)
 	return se, err
 }
 
-func distributionProduceEvTx(account sdk.AccAddress, coins sdk.Coins) (evt shared.EventTransfer, err error) {
-	evt = shared.EventTransfer{
-		Account: shared.Account{ID: account.String()},
+func distributionProduceEvTx(account sdk.AccAddress, coins sdk.Coins) (evt structs.EventTransfer, err error) {
+	evt = structs.EventTransfer{
+		Account: structs.Account{ID: account.String()},
 	}
 	if len(coins) > 0 {
-		evt.Amounts = []shared.TransactionAmount{}
+		evt.Amounts = []structs.TransactionAmount{}
 		for _, coin := range coins {
-			txa := shared.TransactionAmount{
+			txa := structs.TransactionAmount{
 				Currency: coin.Denom,
 				Text:     coin.Amount.String(),
 			}

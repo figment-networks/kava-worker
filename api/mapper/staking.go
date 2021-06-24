@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	shared "github.com/figment-networks/indexer-manager/structs"
+	"github.com/figment-networks/indexer-search/structs"
 	"github.com/figment-networks/kava-worker/api/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -15,7 +15,7 @@ import (
 
 const unbondedTokensPoolAddr = "kava1tygms3xhhs3yv487phx3dw4a95jn7t7lawprey"
 
-func StakingUndelegateToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
+func StakingUndelegateToSub(msg sdk.Msg, logf types.LogFormat) (se structs.SubsetEvent, err error) {
 	u, ok := msg.(staking.MsgUndelegate)
 	if !ok {
 		return se, errors.New("Not a begin_unbonding type")
@@ -31,14 +31,14 @@ func StakingUndelegateToSub(msg sdk.Msg, logf types.LogFormat) (se shared.Subset
 		return se, fmt.Errorf("error converting ValidatorAddress: %w", err)
 	}
 
-	se = shared.SubsetEvent{
+	se = structs.SubsetEvent{
 		Type:   []string{"begin_unbonding"},
 		Module: "staking",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"delegator": {{ID: bech32DelAddr}},
 			"validator": {{ID: bech32ValAddr}},
 		},
-		Amount: map[string]shared.TransactionAmount{
+		Amount: map[string]structs.TransactionAmount{
 			"undelegate": {
 				Currency: u.Amount.Denom,
 				Numeric:  u.Amount.Amount.BigInt(),
@@ -51,7 +51,7 @@ func StakingUndelegateToSub(msg sdk.Msg, logf types.LogFormat) (se shared.Subset
 	return se, nil
 }
 
-func StakingDelegateToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
+func StakingDelegateToSub(msg sdk.Msg, logf types.LogFormat) (se structs.SubsetEvent, err error) {
 	d, ok := msg.(staking.MsgDelegate)
 	if !ok {
 		return se, errors.New("Not a delegate type")
@@ -67,14 +67,14 @@ func StakingDelegateToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEv
 		return se, fmt.Errorf("error converting ValidatorAddress: %w", err)
 	}
 
-	se = shared.SubsetEvent{
+	se = structs.SubsetEvent{
 		Type:   []string{"delegate"},
 		Module: "staking",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"delegator": {{ID: bech32DelAddr}},
 			"validator": {{ID: bech32ValAddr}},
 		},
-		Amount: map[string]shared.TransactionAmount{
+		Amount: map[string]structs.TransactionAmount{
 			"delegate": {
 				Currency: d.Amount.Denom,
 				Numeric:  d.Amount.Amount.BigInt(),
@@ -87,7 +87,7 @@ func StakingDelegateToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEv
 	return se, err
 }
 
-func StakingBeginRedelegateToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
+func StakingBeginRedelegateToSub(msg sdk.Msg, logf types.LogFormat) (se structs.SubsetEvent, err error) {
 	br, ok := msg.(staking.MsgBeginRedelegate)
 	if !ok {
 		return se, errors.New("Not a begin_redelegate type")
@@ -108,15 +108,15 @@ func StakingBeginRedelegateToSub(msg sdk.Msg, logf types.LogFormat) (se shared.S
 		return se, fmt.Errorf("error converting ValidatorSrcAddress: %w", err)
 	}
 
-	se = shared.SubsetEvent{
+	se = structs.SubsetEvent{
 		Type:   []string{"begin_redelegate"},
 		Module: "staking",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"delegator":             {{ID: bech32DelAddr}},
 			"validator_destination": {{ID: bech32ValDstAddr}},
 			"validator_source":      {{ID: bech32ValSrcAddr}},
 		},
-		Amount: map[string]shared.TransactionAmount{
+		Amount: map[string]structs.TransactionAmount{
 			"delegate": {
 				Currency: br.Amount.Denom,
 				Numeric:  br.Amount.Amount.BigInt(),
@@ -129,7 +129,7 @@ func StakingBeginRedelegateToSub(msg sdk.Msg, logf types.LogFormat) (se shared.S
 	return se, err
 }
 
-func StakingCreateValidatorToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func StakingCreateValidatorToSub(msg sdk.Msg) (se structs.SubsetEvent, err error) {
 	ev, ok := msg.(staking.MsgCreateValidator)
 	if !ok {
 		return se, errors.New("Not a create_validator type")
@@ -144,15 +144,15 @@ func StakingCreateValidatorToSub(msg sdk.Msg) (se shared.SubsetEvent, err error)
 		return se, fmt.Errorf("error converting ValidatorAddress: %w", err)
 	}
 
-	return shared.SubsetEvent{
+	return structs.SubsetEvent{
 		Type:   []string{"create_validator"},
 		Module: "distribution",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"delegator": {{ID: bech32DelAddr}},
 			"validator": {
 				{
 					ID: bech32ValAddr,
-					Details: &shared.AccountDetails{
+					Details: &structs.AccountDetails{
 						Name:        ev.Description.Moniker,
 						Description: ev.Description.Details,
 						Contact:     ev.Description.SecurityContact,
@@ -161,7 +161,7 @@ func StakingCreateValidatorToSub(msg sdk.Msg) (se shared.SubsetEvent, err error)
 				},
 			},
 		},
-		Amount: map[string]shared.TransactionAmount{
+		Amount: map[string]structs.TransactionAmount{
 			"self_delegation": {
 				Currency: ev.Value.Denom,
 				Numeric:  ev.Value.Amount.BigInt(),
@@ -186,7 +186,7 @@ func StakingCreateValidatorToSub(msg sdk.Msg) (se shared.SubsetEvent, err error)
 	}, err
 }
 
-func StakingEditValidatorToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
+func StakingEditValidatorToSub(msg sdk.Msg) (se structs.SubsetEvent, err error) {
 	ev, ok := msg.(staking.MsgEditValidator)
 	if !ok {
 		return se, errors.New("Not a edit_validator type")
@@ -197,14 +197,14 @@ func StakingEditValidatorToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 		return se, fmt.Errorf("error converting ValidatorAddress: %w", err)
 	}
 
-	sev := shared.SubsetEvent{
+	sev := structs.SubsetEvent{
 		Type:   []string{"edit_validator"},
 		Module: "distribution",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"validator": {
 				{
 					ID: bech32ValAddr,
-					Details: &shared.AccountDetails{
+					Details: &structs.AccountDetails{
 						Name:        ev.Description.Moniker,
 						Description: ev.Description.Details,
 						Contact:     ev.Description.SecurityContact,
@@ -216,16 +216,16 @@ func StakingEditValidatorToSub(msg sdk.Msg) (se shared.SubsetEvent, err error) {
 	}
 
 	if ev.MinSelfDelegation != nil || ev.CommissionRate != nil {
-		sev.Amount = map[string]shared.TransactionAmount{}
+		sev.Amount = map[string]structs.TransactionAmount{}
 		if ev.MinSelfDelegation != nil {
-			sev.Amount["self_delegation_min"] = shared.TransactionAmount{
+			sev.Amount["self_delegation_min"] = structs.TransactionAmount{
 				Text:    ev.MinSelfDelegation.String(),
 				Numeric: ev.MinSelfDelegation.BigInt(),
 			}
 		}
 
 		if ev.CommissionRate != nil {
-			sev.Amount["commission_rate"] = shared.TransactionAmount{
+			sev.Amount["commission_rate"] = structs.TransactionAmount{
 				Text:    ev.CommissionRate.String(),
 				Numeric: ev.CommissionRate.Int,
 			}

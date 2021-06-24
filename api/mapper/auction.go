@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	shared "github.com/figment-networks/indexer-manager/structs"
+	"github.com/figment-networks/indexer-search/structs"
 	"github.com/figment-networks/kava-worker/api/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -14,7 +14,7 @@ import (
 	"github.com/tendermint/tendermint/libs/bech32"
 )
 
-func AuctionPlaceBidToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEvent, err error) {
+func AuctionPlaceBidToSub(msg sdk.Msg, logf types.LogFormat) (se structs.SubsetEvent, err error) {
 	m, ok := msg.(auction.MsgPlaceBid)
 	if !ok {
 		return se, errors.New("Not a place_bid type")
@@ -25,13 +25,13 @@ func AuctionPlaceBidToSub(msg sdk.Msg, logf types.LogFormat) (se shared.SubsetEv
 		return se, fmt.Errorf("error converting Address: %w", err)
 	}
 
-	se = shared.SubsetEvent{
+	se = structs.SubsetEvent{
 		Type:   []string{"place_bid"},
 		Module: "auction",
-		Node: map[string][]shared.Account{
+		Node: map[string][]structs.Account{
 			"bidder": {{ID: bech32Addr}},
 		},
-		Amount: map[string]shared.TransactionAmount{
+		Amount: map[string]structs.TransactionAmount{
 			"bid": {
 				Currency: m.Amount.Denom,
 				Numeric:  m.Amount.Amount.BigInt(),
