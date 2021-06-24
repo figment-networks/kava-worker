@@ -179,8 +179,8 @@ github.com/facebookgo/subset v0.0.0-20150612182917-8dac2c3c4870/go.mod h1:5tD+ne
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
 github.com/figment-networks/indexer-manager v0.4.0 h1:TLZcYy/hckhbjDy1rVxNXdwxOjxzmbGhckWZmGdYsCQ=
 github.com/figment-networks/indexer-manager v0.4.0/go.mod h1:UKCL59uzNRAzfVWGNWMtLEsqvMOqQFAXcz/DZxi5fhw=
-github.com/figment-networks/indexer-rewards v0.0.1 h1:oqKc+pF26vmOo+qsfv1mwort9X3CyK4Q4R+3Zbez1TU=
-github.com/figment-networks/indexer-rewards v0.0.1/go.mod h1:kji+kNlTEoyw6LhcZLKGpSsCeMphlmIMtb/Ku0ZB6Js=
+github.com/figment-networks/indexer-rewards v0.0.2 h1:LiGYxCpPl3oIZ1sgSk2lskAm1C+7IHH2jr5o43FJXsk=
+github.com/figment-networks/indexer-rewards v0.0.2/go.mod h1:kji+kNlTEoyw6LhcZLKGpSsCeMphlmIMtb/Ku0ZB6Js=
 github.com/figment-networks/indexer-search v0.0.2 h1:IMS6GGCDABALG35uEH9sxps1ECONPlnoL8dpNGRCSu0=
 github.com/figment-networks/indexer-search v0.0.2/go.mod h1:DfPPQa17v8bwtYK8JxhU06MsiP62e6IF8cngzdQdcp4=
 github.com/figment-networks/indexing-engine v0.3.2-0.20210603103553-9df604641a66/go.mod h1:UFL9NtFKENN+YAvfZFwd7OqGk8JZHRxgjZkAbhjulME=
