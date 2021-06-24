@@ -6,7 +6,7 @@ require (
 	github.com/bearcherian/rollzap v1.0.2
 	github.com/cosmos/cosmos-sdk v0.39.2
 	github.com/figment-networks/indexer-manager v0.4.0
-	github.com/figment-networks/indexer-rewards v0.0.1-rc2
+	github.com/figment-networks/indexer-rewards v0.0.1
 	github.com/figment-networks/indexer-search v0.0.2
 	github.com/figment-networks/indexing-engine v0.4.1
 	github.com/google/uuid v1.2.0
