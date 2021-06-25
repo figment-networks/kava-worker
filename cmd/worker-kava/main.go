@@ -17,7 +17,7 @@ import (
 	grpcIndexer "github.com/figment-networks/indexer-manager/worker/transport/grpc"
 	grpcProtoIndexer "github.com/figment-networks/indexer-manager/worker/transport/grpc/indexer"
 
-	httpStore "github.com/figment-networks/indexer-search/common/store/transport/http"
+	httpStore "github.com/figment-networks/indexing-engine/worker/store/transport/http"
 
 	"github.com/figment-networks/indexing-engine/health"
 	"github.com/figment-networks/indexing-engine/metrics"

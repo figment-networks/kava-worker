@@ -3,7 +3,7 @@ package api
 import (
 	"sync"
 
-	"github.com/figment-networks/indexer-search/structs"
+	"github.com/figment-networks/indexing-engine/structs"
 )
 
 // SimpleBlockCache simple in memory block cache to store latest blocks

@@ -10,14 +10,13 @@ import (
 	"github.com/figment-networks/indexing-engine/metrics"
 
 	mStructs "github.com/figment-networks/indexer-manager/structs"
-	rStructs "github.com/figment-networks/indexer-rewards/structs"
-	"github.com/figment-networks/indexer-search/structs"
+	"github.com/figment-networks/indexing-engine/structs"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 
 	cStructs "github.com/figment-networks/indexer-manager/worker/connectivity/structs"
-	"github.com/figment-networks/indexer-search/common/process/ranged"
-	"github.com/figment-networks/indexer-search/common/store"
+	"github.com/figment-networks/indexing-engine/worker/process/ranged"
+	"github.com/figment-networks/indexing-engine/worker/store"
 	"github.com/figment-networks/kava-worker/api"
 )
 
@@ -40,7 +39,7 @@ type RPC interface {
 }
 
 type LCD interface {
-	GetReward(ctx context.Context, params structs.HeightAccount) (resp rStructs.GetRewardResponse, err error)
+	GetReward(ctx context.Context, params structs.HeightAccount) (resp structs.GetRewardResponse, err error)
 }
 
 // IndexerClient is implementation of a client (main worker code)

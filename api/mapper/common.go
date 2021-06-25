@@ -5,7 +5,7 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/figment-networks/indexer-search/structs"
+	"github.com/figment-networks/indexing-engine/structs"
 	"github.com/figment-networks/kava-worker/api/types"
 	"github.com/figment-networks/kava-worker/api/util"
 

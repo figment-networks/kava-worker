@@ -5,10 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	mStructs "github.com/figment-networks/indexer-manager/structs"
 	cStructs "github.com/figment-networks/indexer-manager/worker/connectivity/structs"
-	"github.com/figment-networks/indexer-search/structs"
 	"github.com/figment-networks/indexing-engine/metrics"
+	"github.com/figment-networks/indexing-engine/structs"
 	"go.uber.org/zap"
 )
 
@@ -16,7 +15,7 @@ func (ic *IndexerClient) BlockAndTx(ctx context.Context, height uint64) (blockWM
 	defer ic.logger.Sync()
 	ic.logger.Debug("[KAVA-CLIENT] Getting height", zap.Uint64("block", height))
 
-	hSess, err := ic.storeClient.GetSession(ctx)
+	hSess, err := ic.storeClient.GetSearchSession(ctx)
 	if err != nil {
 		return blockWM, nil, err
 	}
@@ -59,7 +58,7 @@ func (ic *IndexerClient) GetTransactions(ctx context.Context, tr cStructs.TaskRe
 	timer := metrics.NewTimer(getTransactionDuration)
 	defer timer.ObserveDuration()
 
-	hr := &mStructs.HeightRange{}
+	hr := &structs.HeightRange{}
 	err := json.Unmarshal(tr.Payload, hr)
 	if err != nil {
 		ic.logger.Debug("[KAVA-CLIENT] Cannot unmarshal payload", zap.String("contents", string(tr.Payload)))

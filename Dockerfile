@@ -8,8 +8,6 @@ WORKDIR /go/src/github.com/figment-networks/worker-kava/
 COPY ./go.mod .
 COPY ./go.sum .
 
-RUN go mod download
-
 COPY .git .git
 COPY ./Makefile ./Makefile
 COPY ./api ./api

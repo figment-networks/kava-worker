@@ -14,8 +14,8 @@ import (
 	"time"
 
 	cStruct "github.com/figment-networks/indexer-manager/worker/connectivity/structs"
-	"github.com/figment-networks/indexer-search/structs"
 	"github.com/figment-networks/indexing-engine/metrics"
+	"github.com/figment-networks/indexing-engine/structs"
 	"github.com/figment-networks/kava-worker/api/mapper"
 	"github.com/figment-networks/kava-worker/api/types"
 	"github.com/figment-networks/kava-worker/api/util"
