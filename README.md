@@ -59,8 +59,13 @@ CHAIN_ID=kava-7 \
 STORE_HTTP_ENDPOINTS=http://127.0.0.1:8986/input/jsonrpc \
 TENDERMINT_RPC_ADDR=http://127.0.0.1:26657 \
 TENDERMINT_LCD_ADDR=http://127.0.0.1:1317 \
-go run cmd/worker-kava/main.go cmd/worker-kava/dynamic.go cmd/worker-kava/profiling.go
+go run ./cmd/worker-kava
 ```
+
+## Debug with VSCode
+
+The `.vscode` directory contains a launch config to debug the worker.
+
 
 ## Transaction Types
 List of currently supporter transaction types in kava-worker are (listed by modules):

@@ -1,0 +1,16 @@
+{
+    "configurations": [
+        {
+            "name": "Debug",
+            "type": "go",
+            "request": "launch",
+            "program": "${workspaceRoot}/cmd/worker-kava",
+            "env": {
+                "CHAIN_ID": "kava-7",
+                "STORE_HTTP_ENDPOINTS":"http://127.0.0.1:8986/input/jsonrpc",
+                "TENDERMINT_RPC_ADDR":"http://127.0.0.1:26657",
+                "TENDERMINT_LCD_ADDR":"http://127.0.0.1:1317"
+            }
+        }
+    ]
+}
