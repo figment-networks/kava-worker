@@ -48,7 +48,7 @@ If you wanna connect with manager running on docker instance add `HOSTNAME=host.
 First, you will need to set up a few dependencies:
 
 1. [Install Go](https://golang.org/doc/install)
-2. A Kava network node (with both RPC and LCD APIs)
+2. A Kava network node with both RPC and LCD APIs (in this example, we assume it's running at http://localhost)
 3. A running [indexer-manager](https://github.com/figment-networks/indexer-manager) instance
 4. A running datastore API instance (configured with `STORE_HTTP_ENDPOINTS`).
 
@@ -57,8 +57,8 @@ Then, run the worker with some environment config:
 ```
 CHAIN_ID=kava-7 \
 STORE_HTTP_ENDPOINTS=http://127.0.0.1:8986/input/jsonrpc \
-TENDERMINT_RPC_ADDR=http://localhost:26657 \
-TENDERMINT_LCD_ADDR=http://localhost:1317 \
+TENDERMINT_RPC_ADDR=http://127.0.0.1:26657 \
+TENDERMINT_LCD_ADDR=http://127.0.0.1:1317 \
 go run cmd/worker-kava/main.go cmd/worker-kava/dynamic.go cmd/worker-kava/profiling.go
 ```
 
