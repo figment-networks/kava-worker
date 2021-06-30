@@ -48,9 +48,9 @@ If you wanna connect with manager running on docker instance add `HOSTNAME=host.
 First, you will need to set up a few dependencies:
 
 1. [Install Go](https://golang.org/doc/install)
-2. A Kava network node with both RPC and LCD APIs (in this example, we assume it's running at http://localhost)
-3. A running [indexer-manager](https://github.com/figment-networks/indexer-manager) instance
-4. A running datastore API instance (configured with `STORE_HTTP_ENDPOINTS`).
+2. A Kava network node with both RPC and LCD APIs (in this example, we assume it's running at http://127.0.0.1)
+3. A running [manager](https://github.com/figment-networks/indexer-manager) instance
+4. A running datastore API instance (e.g. [search](https://github.com/figment-networks/indexer-search) - this is configured with `STORE_HTTP_ENDPOINTS`)
 
 Then, run the worker with some environment config:
 
@@ -60,6 +60,25 @@ STORE_HTTP_ENDPOINTS=http://127.0.0.1:8986/input/jsonrpc \
 TENDERMINT_RPC_ADDR=http://127.0.0.1:26657 \
 TENDERMINT_LCD_ADDR=http://127.0.0.1:1317 \
 go run ./cmd/worker-kava
+```
+
+Upon success, you should see logs that look like this:
+
+```log
+{"level":"info","time":"2021-06-30T13:35:59.634-0400","msg":"kava-worker  (git: ) - built at "}
+{"level":"info","time":"2021-06-30T13:35:59.634-0400","msg":"Self-hostname (b2ea3a4e-05bd-48f1-8977-988ef093c1ff) is 0.0.0.0:3000 "}
+{"level":"info","time":"2021-06-30T13:35:59.634-0400","msg":"Connecting to managers (127.0.0.1:8085)"}
+{"level":"info","time":"2021-06-30T13:35:59.634-0400","msg":"[New client]","url":"http://127.0.0.1:26657"}
+{"level":"info","time":"2021-06-30T13:35:59.635-0400","msg":"[New client]","url":"http://127.0.0.1:1317"}
+{"level":"info","time":"2021-06-30T13:35:59.635-0400","msg":"[HTTP] Listening on 0.0.0.0:8087"}
+{"level":"info","time":"2021-06-30T13:35:59.635-0400","msg":"[GRPC] Listening on 0.0.0.0:3000"}
+```
+
+Once the worker connects to a running [manager](https://github.com/figment-networks/indexer-manager), which runs by default at `127.0.0.1:8085`, you should see a stream registered in the logs:
+
+```log
+{"level":"debug","time":"2021-06-30T13:55:46.168-0400","msg":"[KAVA-CLIENT] Register Stream","streamID":"55bd3282-764f-4314-ae6a-a0936c18e04d"}
+{"level":"debug","time":"2021-06-30T13:55:46.168-0400","msg":"[GRPC] Send started "}
 ```
 
 ## Debug with VSCode
