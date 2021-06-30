@@ -85,7 +85,7 @@ Once the worker connects to a running [manager](https://github.com/figment-netwo
 
 ## Debug with VSCode
 
-The `.vscode` directory contains a launch config to debug the worker.
+The `.vscode` directory contains a launch config to debug the worker. To start debugging, open the Debug panel (⇧⌘D) and click the green arrow.
 
 
 ## Transaction Types
