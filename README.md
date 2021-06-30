@@ -54,6 +54,8 @@ First, you will need to set up a few dependencies:
 
 Then, run the worker with some environment config:
 
+> Note: if you are running multiple workers, you may need to specify a different port (e.g. `PORT=3001`) to avoid collisions
+
 ```
 CHAIN_ID=kava-7 \
 STORE_HTTP_ENDPOINTS=http://127.0.0.1:8986/input/jsonrpc \
